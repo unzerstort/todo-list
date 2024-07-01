@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>to do list</title>
+
+    <link rel="stylesheet" href="styles.css">
+    <script>
+        function onDragOver(ev) {
+            ev.preventDefault();
+            ev.dataTransfer.dropEffect = "move";
+        }
+
+        function onDragStart(ev) {
+            ev.dataTransfer.setData("text", ev.target.id);
+        }
+
+        function onDrop(ev) {
+            ev.preventDefault();
+            var data = ev.dataTransfer.getData("text");
+            console.log(ev.target.className)
+
+            if (event.target.className === "drop-area") {
+                ev.target.appendChild(document.getElementById(data));
+                
+            }
+        }
+    </script>
+</head>
+
+<body>
+    <div style="display: flex; justify-content: space-around;">
+        <div class="drop-area"
+            id="c1" ondrop="onDrop(event)" ondragover="onDragOver(event)">
+            <div class="card" style="border: solid 2px rebeccapurple; height: 200px; width: 300px; margin-top: 10px;" id="card1" draggable="true" ondragstart="onDragStart(event)">
+                card1
+            </div>
+            <div class="card" style="border: solid 2px rebeccapurple; height: 200px; width: 300px; margin-top: 10px;" id="card2" draggable="true" ondragstart="onDragStart(event)">
+                card2
+            </div>
+            <div class="card" style="border: solid 2px rebeccapurple; height: 200px; width: 300px; margin-top: 10px;" id="card3" draggable="true" ondragstart="onDragStart(event)">
+                card3
+            </div>
+        </div>
+        <div class="drop-area"
+            id="c2" ondrop="onDrop(event)" ondragover="onDragOver(event)">
+
+        </div>
+        <div class="drop-area"
+            id="c3" ondrop="onDrop(event)" ondragover="onDragOver(event)">
+        </div>
+    </div>
+</body>
+
+</html>
