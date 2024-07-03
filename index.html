@@ -7,20 +7,60 @@
     <title>to do list</title>
 
     <link rel="stylesheet" href="public/stylesheets/styles.css">
-    <script src="main.js"></script>
+    <script src="public/js/main.js"></script>
 </head>
 
 <body>
+    <div>
+        <button id="task-modal-btn" class="btn" type="button" onclick="addCard()">
+            Add new task
+        </button>
+
+        <form action="">
+            <label for="task-title">Title</label>
+            <input id="task-title" type="text">
+
+            <label for="task-description">Description</label>
+            <input id="task-description" type="text">
+        
+            <button id="submit-btn" class="btn" type="submit">Create task</button>
+        </form>
+<!-- 
+        <div id="task-modal" class="modal">
+            <span class="close">&times;</span>
+            <div class="modal-content">
+                <form action="">
+                    <label for="task-title">Title</label>
+                    <input id="task-title" type="text">
+    
+                    <label for="task-description">Description</label>
+                    <input id="task-description" type="text">
+                
+                    <button id="submit-btn" class="btn" type="submit">Create task</button>
+                </form>
+            </div>
+        </div> -->
+
+    </div>
     <div style="display: flex; justify-content: space-around;">
         <div class="container" id="c1" ondrop="onDrop(event)" ondragover="onDragOver(event)">
-            <div class="card" id="card1" draggable="true" ondragstart="onDragStart(event)">
-                card1
+            <div class="card" id="card-1" draggable="true" ondragstart="onDragStart(event)">
+                <div class="card-content">
+                    <h4 class="card-title">card1</h4>
+                    <p class="card-description"></p>
+                </div>
             </div>
-            <div class="card" id="card2" draggable="true" ondragstart="onDragStart(event)">
-                card2
+            <div class="card" id="card-2" draggable="true" ondragstart="onDragStart(event)">
+                <div class="card-content">
+                    <h4 class="card-title">card2</h4>
+                    <p class="card-description"></p>
+                </div>
             </div>
-            <div class="card" id="card3" draggable="true" ondragstart="onDragStart(event)">
-                card3
+            <div class="card" id="card-3" draggable="true" ondragstart="onDragStart(event)">
+                <div class="card-content" id="content">
+                    <h4 class="card-title" id="title">card3</h4>
+                    <p class="card-description" id="description"></p>
+                </div>
             </div>
         </div>
         <div class="container" id="c2" ondrop="onDrop(event)" ondragover="onDragOver(event)">

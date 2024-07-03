@@ -1,13 +1,30 @@
-// import mongoose from "mongoose";
+import db from "../config/database.js";
 
-// const taskSchema = new mongoose.Schema(
-//     {
-//         id: { type: String },
-//         title: { type: String, required: true },
-//         description: { type: String },
-//     }
-// );
+class Task {
+    constructor(title, description) {
+        this.title = title;
+        this.description = description;
+    }
+}
 
-// const task = mongoose.model('task', taskSchema);
+class TaskModel {
 
-// export default task;
+    getTasks() {
+        let sql = "SELECT * FROM task";
+
+        return new Promise((resolve, reject) => {
+            db.all(sql, [], (err, rows) => {
+                if (err) {
+                    console.log(err);
+                    reject(err);
+                    return;
+                }
+                console.log(rows);
+                resolve(rows);
+            });
+        });
+    }
+
+}
+
+export { Task, TaskModel };

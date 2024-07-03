@@ -1,3 +1,4 @@
+/* start of drag n drop */
 const cards = document.querySelectorAll('.card');
 const containers = document.querySelectorAll('.container');
 
@@ -57,3 +58,56 @@ function onDrop(ev) {
 
     }
 }
+
+/* end of drag n drop */
+
+function addCard() {
+    const newDiv = document.createElement("div");
+    newDiv.classList.add("card");
+    newDiv.setAttribute("draggable", true);
+    newDiv.setAttribute("ondragstart", "onDragStart(event)");
+    newDiv.setAttribute("id", incrementNextElementId('card'));
+    
+    const container = document.getElementById("c1");
+    container.appendChild(newDiv);
+}
+
+function incrementNextElementId(elementIdPrefix) {
+    const elements = document.querySelectorAll(`[id^='${elementIdPrefix}']`);
+
+    if (elements.length > 0) {
+        let maxSuffix = 0;
+
+        elements.forEach(element => {
+            const id = element.id;
+            const suffix = parseInt(id.split('-')[1]);
+
+            if(!isNaN(suffix) && suffix > maxSuffix) {
+                maxSuffix = suffix;
+            }
+        });
+        
+        const nextId = `${elementIdPrefix}-${maxSuffix + 1}`;
+        return nextId;
+    } else {
+        return `${elementIdPrefix}-1`;
+    }
+}
+
+// const taskModal = document.getElementById('task-modal');
+// const taskModalBtn = document.getElementById('task-modal-btn');
+// const span = document.getElementsByClassName("close")[0];
+
+// taskModalBtn.onclick = function () {
+//     taskModal.style.display = "block";
+// }
+
+// span.onclick = function () {
+//     taskModal.style.display = "none";
+// }
+
+// window.onclick = function (event) {
+//     if (event.target == taskModal) {
+//         taskModal.style.display = "none";
+//     }
+// } 
