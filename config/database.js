@@ -5,16 +5,29 @@ const DBSOURCE = "database.sqlite";
 let db = new sqlite3.Database(DBSOURCE);
 
 db.serialize(() => {
-    db.run(`CREATE TABLE task (
+    db.run(`CREATE TABLE container (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
-        title text NOT NULL, 
-        description text
+        name TEXT NOT NULL
         )`);
 
-    let insert = 'INSERT INTO task (title, description) VALUES (?,?)';
-    db.run(insert, ["Ir ao supermercado", "Comprar itens básicos para a semana"]);
-    db.run(insert, ["Estudar para o exame de matemática", "Revisar álgebra e geometria"]);
-    db.run(insert, ["Ir à academia", ""]);
+    db.run(`CREATE TABLE task (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        title TEXT NOT NULL, 
+        description TEXT,
+        container_id INTEGER NOT NULL,
+        FOREIGN KEY(container_id) REFERENCES container(id)
+        )`);
+
+    let insertContainer = 'INSERT INTO container (name) VALUES (?)';
+    db.run(insertContainer, ["To do"]);
+    db.run(insertContainer, ["Doing"]);
+    db.run(insertContainer, ["Done"]);
+
+
+    let insertTask = 'INSERT INTO task (title, description, container_id) VALUES (?,?,?)';
+    db.run(insertTask, ["Ir ao supermercado", "Comprar itens básicos para a semana", 1]);
+    db.run(insertTask, ["Estudar para o exame de matemática", "Revisar álgebra e geometria", 2]);
+    db.run(insertTask, ["Ir à academia", "", 3]);
 
 });
 
