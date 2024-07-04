@@ -1,9 +1,10 @@
 import db from "../config/database.js";
 
 class Task {
-    constructor(title, description) {
+    constructor(title, description, container_id) {
         this.title = title;
         this.description = description;
+        this.container_id = container_id;
     }
 }
 

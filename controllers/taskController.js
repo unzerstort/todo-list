@@ -18,15 +18,15 @@ class TaskController {
 
     static createTask = async (req, res) => {
         try {
-            const { title, description } = req.body;
-            if (!title) {
-                res.status(400).json({ message: "O título é obrigatório!" });
+            const { title, description, container_id } = req.body;
+            if (!title || !container_id) {
+                res.status(400).json({ message: "O título e o ID do container são obrigatórios!" });
                 return;
             }
             
-            const task = new Task(title, description);
-            const sql = "INSERT INTO task (title, description) VALUES (?, ?)";
-            const params = [task.title, task.description];
+            const task = new Task(title, description, container_id);
+            const sql = "INSERT INTO task (title, description, container_id) VALUES (?, ?, ?)";
+            const params = [task.title, task.description, task.container_id];
             
             db.run(sql, params, function(err) {
                 if (err) {

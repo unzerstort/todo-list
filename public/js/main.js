@@ -68,7 +68,7 @@ function addCard() {
     newDiv.setAttribute("ondragstart", "onDragStart(event)");
     newDiv.setAttribute("id", incrementNextElementId('card'));
     
-    const container = document.getElementById("c1");
+    const container = document.getElementById("container-1");
     container.appendChild(newDiv);
 }
 
