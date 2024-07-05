@@ -42,6 +42,31 @@ class TaskController {
             res.status(500).json({ message: "Erro interno no servidor" });
         }
     }
+
+    static deleteTask = async (req, res) => {
+        try {
+            const { id } = req.params;
+            if (!id) {
+                return res.status(400).json({ message: "O ID da tarefa é obrigatório!" });
+            }
+            
+            const sql = "DELETE FROM task WHERE id = ?";
+            const params = [id];
+            
+            db.run(sql, params, function(err) {
+                if (err) {
+                    return res.status(400).json({ "error": err.message });
+                }
+                
+                res.json({
+                    "message": "success",
+                    "data": { id }
+                });
+            });
+        } catch (err) {
+            res.status(500).json({ message: "Erro interno no servidor" });
+        }
+    }
     
 }
 
