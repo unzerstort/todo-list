@@ -51,25 +51,94 @@ function onDragStart(ev) {
 function onDrop(ev) {
     ev.preventDefault();
 
-    let data = ev.dataTransfer.getData("text");
+    const cardId = ev.dataTransfer.getData("text/plain");
+    const card = document.getElementById(cardId);
+    const newContainerId = ev.target.id;
 
     if (ev.target.className === "container") {
-        ev.target.appendChild(document.getElementById(data));
+        ev.target.appendChild(document.getElementById(cardId));
 
+    }
+
+    if (card && newContainerId.startsWith("container-")) {
+        ev.target.appendChild(card);
+        const taskId = card.getAttribute("data-task-id");
+
+        // Update the container_id in the database
+        updateTaskContainer(taskId, newContainerId.split("-")[1]);
     }
 }
 
+function updateTaskContainer(taskId, newContainerId) {
+    fetch(`${uri}/tasks/move`, {
+        method: "PUT",
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify({ id: taskId, new_container_id: newContainerId })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.message !== "success") {
+            console.error("Erro ao atualizar o container da tarefa");
+        }
+    })
+    .catch(error => {
+        console.error("Erro:", error);
+    });
+}
 /* end of drag n drop */
 
-function addCard() {
-    const newDiv = document.createElement("div");
-    newDiv.classList.add("card");
-    newDiv.setAttribute("draggable", true);
-    newDiv.setAttribute("ondragstart", "onDragStart(event)");
-    newDiv.setAttribute("id", incrementNextElementId('card'));
+function addContainer(containerId) {
+    const container = document.createElement("div");
+    container.classList.add("container");
+    container.setAttribute("ondrop", "onDrop(event)");
+    container.setAttribute("ondragover", "onDragOver(event)");
+    container.setAttribute("id", containerId);
+
+    const containerDiv = document.querySelector(".container-div");
+    containerDiv.appendChild(container);
+}
+
+function addCard(taskId, title, description, containerId) {
+    const card = document.createElement("div");
+    card.classList.add("card");
+    card.setAttribute("draggable", true);
+    card.setAttribute("ondragstart", "onDragStart(event)");
+    card.setAttribute("data-task-id", taskId);
+    card.setAttribute("id", `card-${taskId}`);
+    // card.setAttribute("id", incrementNextElementId('card'));
+
     
-    const container = document.getElementById("container-1");
-    container.appendChild(newDiv);
+    const content = cardContent(title, description);
+    card.appendChild(content);
+
+    const container = document.getElementById(containerId);
+    
+    if (container) {
+        container.appendChild(card);
+    } else {
+        console.error(`Container with ID ${containerId} not found`);
+    }
+
+}
+
+function cardContent(title, description) {
+    const content = document.createElement("div");
+    const contentTitle = document.createElement("h4");
+    const contentDescription = document.createElement("p");
+    
+    content.classList.add("card-content");
+    contentTitle.classList.add("card-title");
+    contentDescription.classList.add("card-description");
+
+    contentTitle.textContent = title;
+    contentDescription.textContent = description;
+
+    content.appendChild(contentTitle);
+    content.appendChild(contentDescription);
+
+    return content;
 }
 
 function incrementNextElementId(elementIdPrefix) {
@@ -94,20 +163,31 @@ function incrementNextElementId(elementIdPrefix) {
     }
 }
 
-// const taskModal = document.getElementById('task-modal');
-// const taskModalBtn = document.getElementById('task-modal-btn');
-// const span = document.getElementsByClassName("close")[0];
+var uri = "http://localhost:3000";
 
-// taskModalBtn.onclick = function () {
-//     taskModal.style.display = "block";
-// }
+document.addEventListener("DOMContentLoaded", function() {
+    fetch(`${uri}/tasks`)
+        .then(response => response.json())
+        .then(data => {
+            if (data.message === "success") {
+                renderContainers(data.data);
+                renderTasks(data.data);
+            } else {
+                console.error('Erro ao obter tarefas');
+            }
+        });
 
-// span.onclick = function () {
-//     taskModal.style.display = "none";
-// }
-
-// window.onclick = function (event) {
-//     if (event.target == taskModal) {
-//         taskModal.style.display = "none";
-//     }
-// } 
+        function renderContainers(containers) {
+            containers.forEach(container => {
+                const containerId = `container-${container.id}`;
+                addContainer(containerId);
+            });
+        }
+    
+        function renderTasks(tasks) {
+            tasks.forEach(task => {
+                const containerId = `container-${task.container_id}`;
+                addCard(task.id, task.title, task.description, containerId);
+            });
+        }
+});

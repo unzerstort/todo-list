@@ -9,6 +9,11 @@
     padding: 10px;
 }
 
+.container-div {
+    display: flex;
+    justify-content: space-around;
+}
+
 .card {
     background-color: pink;
     border: solid 2px pink;
