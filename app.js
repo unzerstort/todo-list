@@ -1,5 +1,6 @@
 import express from 'express';
 import TaskController from './controllers/taskController.js';
+import ContainerController from './controllers/containerController.js';
 
 const app = express();
 const port = process.env.PORT || 3000;
@@ -9,7 +10,7 @@ app.use(express.json());
 
 // Middleware para permitir CORS
 app.use((req, res, next) => {
-    res.setHeader("Access-Control-Allow-Origin", "*"); // Ajuste para a URL do frontend
+    res.setHeader("Access-Control-Allow-Origin", "*"); 
     res.setHeader(
         "Access-Control-Allow-Headers",
         "Origin, X-Requested-With, Content-Type, Accept"
@@ -25,6 +26,7 @@ app.options('*', (req, res) => {
 
 // Rotas
 app.get(`/tasks`, TaskController.listTasks);
+app.get(`/containers`, ContainerController.listContainers);
 app.post(`/tasks/create`, TaskController.createTask);
 app.delete(`/tasks/:id`, TaskController.deleteTask);
 app.put(`/tasks/move`, TaskController.updateContainerId); // Endpoint para mover a tarefa

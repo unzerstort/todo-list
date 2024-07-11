@@ -91,16 +91,103 @@ function updateTaskContainer(taskId, newContainerId) {
 
 function addContainer(containerId) {
     const container = document.createElement("div");
+    const containerDiv = document.querySelector(".container-div");
+
     container.classList.add("container");
     container.setAttribute("ondrop", "onDrop(event)");
     container.setAttribute("ondragover", "onDragOver(event)");
-    container.setAttribute("id", containerId);
 
-    const containerDiv = document.querySelector(".container-div");
-    containerDiv.appendChild(container);
+    if (containerId) {
+        container.setAttribute("id", containerId);
+
+        // Criação do botão de adicionar cartão
+        const addButton = document.createElement("button");
+        addButton.textContent = "Add a card";
+        addButton.classList.add("add-card-button");
+        addButton.addEventListener("click", () => {
+            addButton.style.display = "none";
+            const inputForm = createCardInputForm(containerId, addButton);
+            container.appendChild(inputForm);
+        });
+
+        // Adiciona o container e depois o botão para garantir que o botão fique na parte inferior
+        containerDiv.appendChild(container);
+        container.appendChild(addButton);
+    } else {
+        console.error(`Não foi possível criar o container, ${containerId} não possui valor.`);
+    }
 }
 
-function addCard(taskId, title, description, containerId) {
+function createCardInputForm(containerId, addButton) {
+    const form = document.createElement("form");
+    form.classList.add("card-input-form");
+
+    const titleInput = document.createElement("input");
+    titleInput.classList.add("card-title-input");
+    titleInput.placeholder = "Enter a title for this card...";
+
+    const buttonContainer = document.createElement("div");
+    buttonContainer.classList.add("button-container");
+
+    const saveButton = document.createElement("button");
+    saveButton.textContent = "Add card";
+    saveButton.classList.add("submit-card-button");
+    saveButton.addEventListener("click", () => {
+        const title = titleInput.value.trim();
+        if (title) {
+            addCardToDatabase(title, "", containerId);
+            form.remove();
+            addButton.style.display = "block";
+        } else {
+            alert("Card title cannot be empty.");
+        }
+    });
+
+    const cancelButton = document.createElement("button");
+    cancelButton.innerHTML = "&times;" ;
+    cancelButton.classList.add("cancel-card-button");
+    cancelButton.addEventListener("click", () => {
+        form.remove();
+        addButton.style.display = "block";
+    });
+
+    buttonContainer.appendChild(saveButton);
+    buttonContainer.appendChild(cancelButton);
+
+    form.appendChild(titleInput);
+    form.appendChild(buttonContainer);
+
+    return form;
+}
+
+function addCardToDatabase(title, description, containerId) {
+    const taskData = {
+        title: title,
+        description: description,
+        container_id: parseInt(containerId.split("-")[1])
+    };
+
+    fetch(`${uri}/tasks/create`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(taskData)
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.message === "success") {
+            addCardToContainer(data.data.id, title, description, containerId); 
+        } else {
+            console.error('Erro ao criar a tarefa');
+        }
+    })
+    .catch(error => {
+        console.error('Erro:', error);
+    });
+}
+
+function addCardToContainer(taskId, title, description, containerId) {
     const card = document.createElement("div");
     card.classList.add("card");
     card.setAttribute("draggable", true);
@@ -120,7 +207,6 @@ function addCard(taskId, title, description, containerId) {
     } else {
         console.error(`Container with ID ${containerId} not found`);
     }
-
 }
 
 function cardContent(title, description) {
@@ -166,28 +252,40 @@ function incrementNextElementId(elementIdPrefix) {
 var uri = "http://localhost:3000";
 
 document.addEventListener("DOMContentLoaded", function() {
-    fetch(`${uri}/tasks`)
+    fetch(`${uri}/containers`)
         .then(response => response.json())
         .then(data => {
             if (data.message === "success") {
                 renderContainers(data.data);
+
+                return fetch(`${uri}/tasks`);
+            } else {
+                throw new Error('Erro ao obter containers');
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.message === "success") {
                 renderTasks(data.data);
             } else {
                 console.error('Erro ao obter tarefas');
             }
+        })
+        .catch(error => {
+            console.error('Erro:', error);
         });
 
-        function renderContainers(containers) {
-            containers.forEach(container => {
-                const containerId = `container-${container.id}`;
-                addContainer(containerId);
-            });
-        }
-    
-        function renderTasks(tasks) {
-            tasks.forEach(task => {
-                const containerId = `container-${task.container_id}`;
-                addCard(task.id, task.title, task.description, containerId);
-            });
-        }
+    function renderContainers(containers) {
+        containers.forEach(container => {
+            const containerId = `container-${container.id}`;
+            addContainer(containerId);
+        });
+    }
+
+    function renderTasks(tasks) {
+        tasks.forEach(task => {
+            const containerId = `container-${task.container_id}`;
+            addCardToContainer(task.id, task.title, task.description, containerId);
+        });
+    }
 });
