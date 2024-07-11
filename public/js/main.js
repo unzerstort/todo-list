@@ -77,15 +77,15 @@ function updateTaskContainer(taskId, newContainerId) {
         },
         body: JSON.stringify({ id: taskId, new_container_id: newContainerId })
     })
-    .then(response => response.json())
-    .then(data => {
-        if (data.message !== "success") {
-            console.error("Erro ao atualizar o container da tarefa");
-        }
-    })
-    .catch(error => {
-        console.error("Erro:", error);
-    });
+        .then(response => response.json())
+        .then(data => {
+            if (data.message !== "success") {
+                console.error("Erro ao atualizar o container da tarefa");
+            }
+        })
+        .catch(error => {
+            console.error("Erro:", error);
+        });
 }
 /* end of drag n drop */
 
@@ -118,8 +118,10 @@ function addContainer(containerId) {
     }
 }
 
+/* Card forms */
 function createCardInputForm(containerId, addButton) {
     const form = document.createElement("form");
+    form.setAttribute("id", "create-card-form");
     form.classList.add("card-input-form");
 
     const titleInput = document.createElement("input");
@@ -144,7 +146,7 @@ function createCardInputForm(containerId, addButton) {
     });
 
     const cancelButton = document.createElement("button");
-    cancelButton.innerHTML = "&times;" ;
+    cancelButton.innerHTML = "&times;";
     cancelButton.classList.add("cancel-card-button");
     cancelButton.addEventListener("click", () => {
         form.remove();
@@ -160,6 +162,54 @@ function createCardInputForm(containerId, addButton) {
     return form;
 }
 
+function createEditCardForm(card, containerId) {
+    const form = document.createElement("form");
+    form.setAttribute("id", "edit-card-form");
+    form.classList.add("card-input-form");
+
+    const titleInput = document.createElement("input");
+    titleInput.classList.add("card-title-input");
+    titleInput.value = card.querySelector(".card-title").textContent; // Preenche o input com o título atual
+
+    const buttonContainer = document.createElement("div");
+    buttonContainer.classList.add("button-container");
+
+    const saveButton = document.createElement("button");
+    saveButton.textContent = "Save";
+    saveButton.classList.add("submit-card-button");
+    saveButton.addEventListener("click", (e) => {
+        e.preventDefault();
+        const title = titleInput.value.trim();
+        if (title) {
+            updateCardInDatabase(card.getAttribute("data-task-id"), title, "");
+            form.remove();
+            card.style.display = "block";
+            card.querySelector(".card-title").textContent = title;
+        } else {
+            alert("Card title cannot be empty.");
+        }
+    });
+
+    const cancelButton = document.createElement("button");
+    cancelButton.innerHTML = "&times;";
+    cancelButton.classList.add("cancel-card-button");
+    cancelButton.addEventListener("click", (e) => {
+        e.preventDefault();
+        form.remove();
+        card.style.display = "block";
+    });
+
+    buttonContainer.appendChild(saveButton);
+    buttonContainer.appendChild(cancelButton);
+
+    form.appendChild(titleInput);
+    form.appendChild(buttonContainer);
+
+    return form;
+}
+
+/* end of card forms */
+
 function addCardToDatabase(title, description, containerId) {
     const taskData = {
         title: title,
@@ -174,17 +224,45 @@ function addCardToDatabase(title, description, containerId) {
         },
         body: JSON.stringify(taskData)
     })
-    .then(response => response.json())
-    .then(data => {
-        if (data.message === "success") {
-            addCardToContainer(data.data.id, title, description, containerId); 
-        } else {
-            console.error('Erro ao criar a tarefa');
-        }
+        .then(response => response.json())
+        .then(data => {
+            if (data.message === "success") {
+                addCardToContainer(data.data.id, title, description, containerId);
+            } else {
+                console.error('Erro ao criar a tarefa');
+            }
+        })
+        .catch(error => {
+            console.error('Erro:', error);
+        });
+}
+
+function updateCardInDatabase(taskId, newTitle, newDescription, containerId) {
+    // Função para atualizar o card no banco de dados
+    const taskData = {
+        id: taskId,
+        title: newTitle,
+        description: newDescription,
+        container_id: containerId
+    };
+
+    fetch(`${uri}/tasks/update`, {
+        method: 'PUT',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(taskData)
     })
-    .catch(error => {
-        console.error('Erro:', error);
-    });
+        .then(response => response.json())
+        .then(data => {
+            console.log(data);
+            if (data.message !== "success") {
+                console.error('Erro ao atualizar a tarefa');
+            }
+        })
+        .catch(error => {
+            console.error('Erro:', error);
+        });
 }
 
 function addCardToContainer(taskId, title, description, containerId) {
@@ -196,24 +274,35 @@ function addCardToContainer(taskId, title, description, containerId) {
     card.setAttribute("id", `card-${taskId}`);
     // card.setAttribute("id", incrementNextElementId('card'));
 
-    
+
     const content = cardContent(title, description);
     card.appendChild(content);
 
     const container = document.getElementById(containerId);
-    
+
     if (container) {
         container.appendChild(card);
     } else {
         console.error(`Container with ID ${containerId} not found`);
     }
+
+    const editButton = document.createElement("button");
+    editButton.classList.add("edit-btn");
+    editButton.innerHTML = "Edit";
+    editButton.addEventListener("click", () => {
+        card.style.display = "none";
+        const editForm = createEditCardForm(card, containerId);
+        card.parentElement.insertBefore(editForm, card.nextSibling);
+    });
+
+    card.appendChild(editButton);
 }
 
 function cardContent(title, description) {
     const content = document.createElement("div");
     const contentTitle = document.createElement("h4");
     const contentDescription = document.createElement("p");
-    
+
     content.classList.add("card-content");
     contentTitle.classList.add("card-title");
     contentDescription.classList.add("card-description");
@@ -237,11 +326,11 @@ function incrementNextElementId(elementIdPrefix) {
             const id = element.id;
             const suffix = parseInt(id.split('-')[1]);
 
-            if(!isNaN(suffix) && suffix > maxSuffix) {
+            if (!isNaN(suffix) && suffix > maxSuffix) {
                 maxSuffix = suffix;
             }
         });
-        
+
         const nextId = `${elementIdPrefix}-${maxSuffix + 1}`;
         return nextId;
     } else {
@@ -251,7 +340,7 @@ function incrementNextElementId(elementIdPrefix) {
 
 var uri = "http://localhost:3000";
 
-document.addEventListener("DOMContentLoaded", function() {
+document.addEventListener("DOMContentLoaded", function () {
     fetch(`${uri}/containers`)
         .then(response => response.json())
         .then(data => {

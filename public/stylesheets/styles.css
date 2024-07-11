@@ -28,8 +28,16 @@
     border: solid 3px plum;
 }
 
+.card:hover .edit-btn {
+    display: block;
+}
+
 .card.dragging {
     opacity: 0.5;
+}
+
+.edit-btn {
+    display: none;
 }
 
 /* .btn {} */

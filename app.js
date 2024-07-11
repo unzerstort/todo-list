@@ -29,7 +29,8 @@ app.get(`/tasks`, TaskController.listTasks);
 app.get(`/containers`, ContainerController.listContainers);
 app.post(`/tasks/create`, TaskController.createTask);
 app.delete(`/tasks/:id`, TaskController.deleteTask);
-app.put(`/tasks/move`, TaskController.updateContainerId); // Endpoint para mover a tarefa
+app.put(`/tasks/move`, TaskController.updateContainerId);
+app.put(`/tasks/update`, TaskController.updateTask);
 
 app.listen(port, () => {
     console.log(`Server running on port ${port}`);

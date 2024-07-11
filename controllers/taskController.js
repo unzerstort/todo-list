@@ -12,84 +12,73 @@ class TaskController {
                 })
             });
         } catch (err) {
-            res.status(500).json({ message: "Erro interno no servidor!"});
+            res.status(500).json({ message: "Erro interno no servidor!" });
         }
     }
 
     static createTask = async (req, res) => {
         try {
             const { title, description, container_id } = req.body;
-            if (!title || !container_id) {
-                res.status(400).json({ message: "O título e o ID do container são obrigatórios!" });
-                return;
-            }
-            
-            const task = new Task(title, description, container_id);
-            const sql = "INSERT INTO task (title, description, container_id) VALUES (?, ?, ?)";
-            const params = [task.title, task.description, task.container_id];
-            
-            db.run(sql, params, function(err) {
-                if (err) {
-                    res.status(400).json({ "error": err.message });
-                    return;
-                }
-                res.json({
-                    "message": "success",
-                    "data": { id: this.lastID, ...task }
-                });
+
+            const newTask = await TaskModel.createTask(title, description, container_id);
+
+            res.json({
+                message: "Tarefa criada com sucesso",
+                data: newTask
             });
         } catch (err) {
-            res.status(500).json({ message: "Erro interno no servidor" });
+            res.status(500).json({ message: "Erro interno no servidor", error: err.message });
+        }
+    }
+
+    static updateTask = async (req, res) => {
+        try {
+            const { id, title, description } = req.body;
+            if (!id) {
+                return res.status(400).json({ message: "O ID da tarefa é obrigatório!" });
+            }
+
+            const updatedTask = await TaskModel.updateTask(id, title, description);
+
+            res.json({
+                message: "Tarefa atualizada com sucesso",
+                data: updatedTask
+            });
+        } catch (err) {
+            if (err.message === "Tarefa não encontrada!") {
+                return res.status(404).json({ message: "Tarefa não encontrada!" });
+            }
+            res.status(500).json({ message: "Erro interno no servidor", error: err.message });
         }
     }
 
     static deleteTask = async (req, res) => {
         try {
             const { id } = req.params;
-            if (!id) {
-                return res.status(400).json({ message: "O ID da tarefa é obrigatório!" });
-            }
-            
-            const sql = "DELETE FROM task WHERE id = ?";
-            const params = [id];
-            
-            db.run(sql, params, function(err) {
-                if (err) {
-                    return res.status(400).json({ "error": err.message });
-                }
-                
-                res.json({
-                    "message": "success",
-                    "data": { id }
-                });
+
+            await TaskModel.deleteTask(id);
+
+            res.json({
+                message: "Tarefa deletada com sucesso",
+                data: { id }
             });
         } catch (err) {
-            res.status(500).json({ message: "Erro interno no servidor" });
+            res.status(500).json({ message: "Erro interno no servidor", error: err.message });
         }
     }
 
     static updateContainerId = async (req, res) => {
         try {
             const { id, new_container_id } = req.body;
-            if (!id || !new_container_id) {
-                return res.status(400).json({ message: "O ID da tarefa e o novo ID do container são obrigatórios!" });
-            }
 
-            const sql = "UPDATE task SET container_id = ? WHERE id = ?";
-            const params = [new_container_id, id];
-            
-            db.run(sql, params, function(err) {
-                if (err) {
-                    return res.status(400).json({ "error": err.message });
-                }
-                
-                res.json({
-                    "message": "success",
-                    "data": { id, new_container_id }
-                });
+            await TaskModel.updateContainerId(id, new_container_id);
+
+            res.json({
+                message: "Container da tarefa atualizado com sucesso",
+                data: { id, new_container_id }
             });
         } catch (err) {
-            res.status(500).json({ message: "Erro interno no servidor" });
+            res.status(500).json({ message: "Erro interno no servidor", error: err.message });
         }
     }
 }
