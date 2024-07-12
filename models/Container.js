@@ -1,8 +1,7 @@
 import db from "../config/database.js";
 
 class Container {
-    constructor(id, name) {
-        this.id = id;
+    constructor(name) {
         this.name = name;
     }
 }
@@ -23,7 +22,28 @@ class ContainerModel {
         });
     }
 
-     // TODO: add addContainer, deleteContainer, editContainerTitle 
+    // TODO: add deleteContainer, editContainerTitle, moveContainer
+
+    static createContainer(name) {
+        return new Promise((resolve, reject) => {
+            if (!name) {
+                reject(new Error("O nome do container é obrigatório!"));
+                return;
+            }
+
+            const container = new Container(name);
+            const sql = "INSERT INTO container (name) VALUES (?)";
+            const params = [container.name];
+
+            db.run(sql, params, function (err) {
+                if (err) {
+                    reject(err);
+                    return;
+                }
+                resolve({ id: this.lastID, ...container });
+            });
+        });
+    }
 }
 
 export { Container, ContainerModel };

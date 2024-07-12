@@ -15,6 +15,21 @@ class ContainerController {
             res.status(500).json({ message: "Erro interno no servidor!"});
         }
     }
+
+    static createContainer = async (req, res) => {
+        try {
+            const { name } = req.body;
+
+            const newContainer = await ContainerModel.createContainer(name);
+
+            res.json({
+                message: "Container criado com sucesso",
+                data: newContainer
+            });
+        } catch (err) {
+            res.status(500).json({ message: "Erro interno no servidor", error: err.message });
+        }
+    }
 }
 
 export default ContainerController;
