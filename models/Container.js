@@ -22,7 +22,7 @@ class ContainerModel {
         });
     }
 
-    // TODO: add deleteContainer, editContainerTitle, moveContainer
+    // TODO: add moveContainer
 
     static createContainer(name) {
         return new Promise((resolve, reject) => {
@@ -62,6 +62,35 @@ class ContainerModel {
                 }
 
                 resolve({ id });
+            });
+        });
+    }
+
+    static updateContainerName(id, name) {
+        return new Promise((resolve, reject) => {
+            const checkSql = "SELECT * FROM container WHERE id = ?";
+            db.get(checkSql, [id], (err, row) => {
+                if (err) {
+                    reject(err);
+                    return;
+                }
+
+                if (!row) {
+                    reject(new Error("Container não encontrado!"));
+                    return;
+                }
+
+                const updateSql = "UPDATE container SET name = ? WHERE id = ?";
+                const params = [name, id];
+
+                db.run(updateSql, params, function (err) {
+                    if (err) {
+                        reject(err);
+                        return;
+                    }
+
+                    resolve({ id, name: name });
+                });
             });
         });
     }

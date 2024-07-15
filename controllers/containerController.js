@@ -45,6 +45,27 @@ class ContainerController {
             res.status(500).json({ message: "Erro interno no servidor", error: err.message });
         }
     }
+    
+    static updateContainerName = async (req, res) => {
+        try {
+            const { id, name } = req.body;
+            if (!id) {
+                return res.status(400).json({ message: "O ID do container é obrigatório!" });
+            }
+
+            const updatedContainer = await ContainerModel.updateContainerName(id, name);
+
+            res.json({
+                message: "Container atualizado com sucesso",
+                data: updatedContainer
+            });
+        } catch (err) {
+            if (err.message === "Container não encontrado!") {
+                return res.status(404).json({ message: "Container não encontrado!" });
+            }
+            res.status(500).json({ message: "Erro interno no servidor", error: err.message });
+        }
+    }
 }
 
 export default ContainerController;

@@ -36,6 +36,7 @@ app.delete(`/containers/:id`, ContainerController.deleteContainer);
 
 app.put(`/tasks/move`, TaskController.updateContainerId);
 app.put(`/tasks/update`, TaskController.updateTask);
+app.put(`/containers/update`, ContainerController.updateContainerName);
 
 app.listen(port, () => {
     console.log(`Server running on port ${port}`);
