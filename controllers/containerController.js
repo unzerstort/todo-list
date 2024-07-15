@@ -38,7 +38,7 @@ class ContainerController {
             await ContainerModel.deleteContainer(id);
 
             res.json({
-                message: "Container deletado com sucesso",
+                message: "success",
                 data: { id }
             });
         } catch (err) {
@@ -56,7 +56,7 @@ class ContainerController {
             const updatedContainer = await ContainerModel.updateContainerName(id, name);
 
             res.json({
-                message: "Container atualizado com sucesso",
+                message: "success",
                 data: updatedContainer
             });
         } catch (err) {

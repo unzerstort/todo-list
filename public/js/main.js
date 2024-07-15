@@ -89,18 +89,48 @@ function updateTaskContainer(taskId, newContainerId) {
 }
 /* end of drag n drop */
 
-function addContainer(containerId) {
+function addContainer(containerId, containerName) {
     const container = document.createElement("div");
     const containerDiv = document.querySelector(".container-div");
-
+    
     container.classList.add("container");
     container.setAttribute("ondrop", "onDrop(event)");
     container.setAttribute("ondragover", "onDragOver(event)");
+    container.setAttribute("id", containerId);
 
-    if (containerId) {
-        container.setAttribute("id", containerId);
+    if (containerId && containerName) {
 
-        // Criação do botão de adicionar cartão
+        const title = document.createElement("h3");
+        title.textContent = containerName;
+        title.classList.add("container-title");
+        container.appendChild(title);
+
+        title.addEventListener("click", () => {
+            const input = document.createElement("input");
+            input.type = "text";
+            input.value = containerName;
+            input.classList.add("edit-container-name");
+            container.replaceChild(input, title);
+            input.focus();
+
+            const saveNewName = () => {
+                const newName = input.value.trim();
+                if (newName) {
+                    containerName = newName;
+                    title.textContent = newName;
+                    updateContainerNameOnDatabase(containerId, containerName);
+                }
+                container.replaceChild(title, input);
+            };
+
+            input.addEventListener("blur", saveNewName);
+            input.addEventListener("keypress", (event) => {
+                if (event.key === "Enter") {
+                    saveNewName();
+                }
+            });
+        });
+
         const addButton = document.createElement("button");
         addButton.textContent = "Add a card";
         addButton.classList.add("add-card-button");
@@ -110,12 +140,34 @@ function addContainer(containerId) {
             container.appendChild(inputForm);
         });
 
-        // Adiciona o container e depois o botão para garantir que o botão fique na parte inferior
         containerDiv.appendChild(container);
         container.appendChild(addButton);
     } else {
-        console.error(`Não foi possível criar o container, ${containerId} não possui valor.`);
+        console.error(`Não foi possível criar o container, ${containerId} ou ${containerName} não possui valor.`);
     }
+}
+
+function updateContainerNameOnDatabase(containerId, containerName) {
+    const idNum = parseInt(containerId.split("-")[1]);
+    const data = { id: idNum, name: containerName };
+
+    fetch(`${uri}/containers/update`, {
+        method: 'PUT',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(data)
+    })
+    .then(response => response.json())
+    .then(data => {
+        console.log(data);
+        if (data.message !== "success") {
+            console.error('Erro ao atualizar o nome do container.');
+        }
+    })
+    .catch(error => {
+        console.error('Erro:', error);
+    });
 }
 
 /* Card forms */
@@ -209,13 +261,6 @@ function createEditCardForm(card, containerId) {
 }
 
 /* end of card forms */
-
-/* container forms  */
-
-
-
-
-/* end of container forms */
 
 function addCardToDatabase(title, description, containerId) {
     const taskData = {
@@ -374,7 +419,8 @@ document.addEventListener("DOMContentLoaded", function () {
     function renderContainers(containers) {
         containers.forEach(container => {
             const containerId = `container-${container.id}`;
-            addContainer(containerId);
+            const containerName = `${container.name}`
+            addContainer(containerId, containerName);
         });
     }
 

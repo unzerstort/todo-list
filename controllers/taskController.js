@@ -23,7 +23,7 @@ class TaskController {
             const newTask = await TaskModel.createTask(title, description, container_id);
 
             res.json({
-                message: "Tarefa criada com sucesso",
+                message: "success",
                 data: newTask
             });
         } catch (err) {
@@ -41,7 +41,7 @@ class TaskController {
             const updatedTask = await TaskModel.updateTask(id, title, description);
 
             res.json({
-                message: "Tarefa atualizada com sucesso",
+                message: "success",
                 data: updatedTask
             });
         } catch (err) {
@@ -59,7 +59,7 @@ class TaskController {
             await TaskModel.deleteTask(id);
 
             res.json({
-                message: "Tarefa deletada com sucesso",
+                message: "success",
                 data: { id }
             });
         } catch (err) {
@@ -74,7 +74,7 @@ class TaskController {
             await TaskModel.updateContainerId(id, new_container_id);
 
             res.json({
-                message: "Container da tarefa atualizado com sucesso",
+                message: "success",
                 data: { id, new_container_id }
             });
         } catch (err) {
