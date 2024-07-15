@@ -30,6 +30,21 @@ class ContainerController {
             res.status(500).json({ message: "Erro interno no servidor", error: err.message });
         }
     }
+
+    static deleteContainer = async (req, res) => {
+        try {
+            const { id } = req.params;
+
+            await ContainerModel.deleteContainer(id);
+
+            res.json({
+                message: "Container deletado com sucesso",
+                data: { id }
+            });
+        } catch (err) {
+            res.status(500).json({ message: "Erro interno no servidor", error: err.message });
+        }
+    }
 }
 
 export default ContainerController;

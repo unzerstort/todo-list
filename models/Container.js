@@ -44,6 +44,27 @@ class ContainerModel {
             });
         });
     }
+
+    static deleteContainer(id) {
+        return new Promise((resolve, reject) => {
+            if (!id) {
+                reject(new Error("O ID do container é obrigatório!"));
+                return;
+            }
+
+            const sql = "DELETE FROM container WHERE id = ?";
+            const params = [id];
+
+            db.run(sql, params, function (err) {
+                if (err) {
+                    reject(err);
+                    return;
+                }
+
+                resolve({ id });
+            });
+        });
+    }
 }
 
 export { Container, ContainerModel };

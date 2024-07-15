@@ -27,9 +27,13 @@ app.options('*', (req, res) => {
 // Rotas
 app.get(`/tasks`, TaskController.listTasks);
 app.get(`/containers`, ContainerController.listContainers);
+
 app.post(`/tasks/create`, TaskController.createTask);
 app.post(`/containers/create`, ContainerController.createContainer);
+
 app.delete(`/tasks/:id`, TaskController.deleteTask);
+app.delete(`/containers/:id`, ContainerController.deleteContainer);
+
 app.put(`/tasks/move`, TaskController.updateContainerId);
 app.put(`/tasks/update`, TaskController.updateTask);
 
