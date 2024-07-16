@@ -1,4 +1,3 @@
-import db from "../config/database.js";
 import { ContainerModel } from "../models/Container.js";
 
 class ContainerController {

@@ -1,3 +1,5 @@
+var uri = "http://localhost:3000";
+
 /* start of drag n drop */
 const cards = document.querySelectorAll('.card');
 const containers = document.querySelectorAll('.container');
@@ -68,7 +70,243 @@ function onDrop(ev) {
         updateTaskContainer(taskId, newContainerId.split("-")[1]);
     }
 }
+/* end of drag n drop */
 
+/* UTILS */
+function createInputElement(className, placeholder = '', value = '') {
+    const input = document.createElement("input");
+    input.classList.add(className);
+    input.placeholder = placeholder;
+    input.value = value;
+    return input;
+}
+
+function createButtonElement(text, className, clickHandler) {
+    const button = document.createElement("button");
+    button.innerHTML = text;
+    button.classList.add(className);
+    button.addEventListener("click", clickHandler);
+    return button;
+}
+/* END OF UTILS */
+
+/* CARDS */
+function createCardElement(taskId, title, description) {
+    const card = document.createElement("div");
+    card.classList.add("card");
+    card.setAttribute("draggable", true);
+    card.setAttribute("ondragstart", "onDragStart(event)");
+    card.setAttribute("data-task-id", taskId);
+    card.setAttribute("id", `card-${taskId}`);
+
+    const content = cardContent(title, description);
+    card.appendChild(content);
+
+    return card;
+}
+
+function createEditButton(card, containerId) {
+    const editButton = document.createElement("button");
+    editButton.classList.add("edit-btn");
+    editButton.innerHTML = "Edit";
+    editButton.addEventListener("click", () => {
+        card.style.display = "none";
+        const editForm = createEditCardForm(card, containerId);
+        card.parentElement.insertBefore(editForm, card.nextSibling);
+    });
+    return editButton;
+}
+
+function addCardToContainer(taskId, title, description, containerId) {
+    const card = createCardElement(taskId, title, description);
+
+    const container = document.getElementById(containerId);
+    if (container) {
+        container.appendChild(card);
+    } else {
+        console.error(`Container with ID ${containerId} not found`);
+        return;
+    }
+
+    const editButton = createEditButton(card, containerId);
+    card.appendChild(editButton);
+}
+
+function cardContent(title, description) {
+    const contentDiv = document.createElement("div");
+    contentDiv.classList.add("card-content");
+
+    const titleElement = document.createElement("h4");
+    titleElement.classList.add("card-title");
+    titleElement.textContent = title;
+
+    const descriptionElement = document.createElement("p");
+    descriptionElement.classList.add("card-description");
+    descriptionElement.textContent = description;
+
+    contentDiv.appendChild(titleElement);
+    contentDiv.appendChild(descriptionElement);
+
+    return contentDiv;
+}
+
+function createFormContainer() {
+    const form = document.createElement("form");
+    form.classList.add("card-input-form");
+
+    const buttonContainer = document.createElement("div");
+    buttonContainer.classList.add("button-container");
+
+    form.appendChild(buttonContainer);
+
+    return { form, buttonContainer };
+}
+
+function createCardInputForm(containerId, addButton) {
+    const { form, buttonContainer } = createFormContainer();
+    form.setAttribute("id", "create-card-form");
+
+    const titleInput = createInputElement("card-title-input", "Enter a title for this card...");
+
+    const saveButton = createButtonElement("Add card", "submit-card-button", () => {
+        const title = titleInput.value.trim();
+        if (title) {
+            addCardToDatabase(title, "", containerId);
+            form.remove();
+            addButton.style.display = "block";
+        } else {
+            alert("Card title cannot be empty.");
+        }
+    });
+
+    const cancelButton = createButtonElement("&times;", "cancel-card-button", () => {
+        form.remove();
+        addButton.style.display = "block";
+    });
+
+    buttonContainer.appendChild(saveButton);
+    buttonContainer.appendChild(cancelButton);
+
+    form.appendChild(titleInput);
+
+    return form;
+}
+
+function createEditCardForm(card, containerId) {
+    const { form, buttonContainer } = createFormContainer();
+    form.setAttribute("id", "edit-card-form");
+
+    const titleInput = createInputElement("card-title-input", '', card.querySelector(".card-title").textContent);
+
+    const saveButton = createButtonElement("Save", "submit-card-button", (e) => {
+        e.preventDefault();
+        const title = titleInput.value.trim();
+        if (title) {
+            updateCardOnDatabase(card.getAttribute("data-task-id"), title, "");
+            form.remove();
+            card.style.display = "block";
+            card.querySelector(".card-title").textContent = title;
+        } else {
+            alert("Card title cannot be empty.");
+        }
+    });
+
+    const cancelButton = createButtonElement("&times;", "cancel-card-button", (e) => {
+        e.preventDefault();
+        form.remove();
+        card.style.display = "block";
+    });
+
+    buttonContainer.appendChild(saveButton);
+    buttonContainer.appendChild(cancelButton);
+
+    form.appendChild(titleInput);
+
+    return form;
+}
+
+/* END OF CARDS */
+
+/* CONTAINERS */
+function createContainerElement(containerId, containerName) {
+    const container = document.createElement("div");
+    container.classList.add("container");
+    container.setAttribute("ondrop", "onDrop(event)");
+    container.setAttribute("ondragover", "onDragOver(event)");
+    container.setAttribute("id", containerId);
+
+    return container;
+}
+
+function createContainerTitle(containerName, containerId) {
+    const title = document.createElement("h3");
+    title.textContent = containerName;
+    title.classList.add("container-title");
+
+    title.addEventListener("click", () => handleTitleClick(title, containerName, containerId));
+
+    return title;
+}
+
+function handleTitleClick(title, containerName, containerId) {
+    const input = document.createElement("input");
+    input.type = "text";
+    input.value = containerName;
+    input.classList.add("edit-container-name");
+    
+    title.replaceWith(input);
+    input.focus();
+
+    const saveNewName = () => {
+        const newName = input.value.trim();
+        if (newName) {
+            containerName = newName;
+            title.textContent = newName;
+            updateContainerNameOnDatabase(containerId, newName);
+        }
+        input.replaceWith(title);
+    };
+
+    input.addEventListener("blur", saveNewName);
+    input.addEventListener("keypress", (event) => {
+        if (event.key === "Enter") {
+            saveNewName();
+        }
+    });
+}
+
+function createAddCardButton(containerId) {
+    const addButton = document.createElement("button");
+    addButton.textContent = "Add a card";
+    addButton.classList.add("add-card-button");
+
+    addButton.addEventListener("click", () => {
+        addButton.style.display = "none";
+        const inputForm = createCardInputForm(containerId, addButton);
+        addButton.parentElement.appendChild(inputForm);
+    });
+
+    return addButton;
+}
+
+function addContainer(containerId, containerName) {
+    if (!containerId || !containerName) {
+        console.error(`Não foi possível criar o container, ${containerId} ou ${containerName} não possui valor.`);
+        return;
+    }
+
+    const containerDiv = document.querySelector(".container-div");
+    const container = createContainerElement(containerId, containerName);
+    const title = createContainerTitle(containerName, containerId);
+    const addButton = createAddCardButton(containerId);
+
+    container.appendChild(title);
+    container.appendChild(addButton);
+    containerDiv.appendChild(container);
+}
+/* END OF CONTAINERS */
+
+/* REQUESTS */
 function updateTaskContainer(taskId, newContainerId) {
     fetch(`${uri}/tasks/move`, {
         method: "PUT",
@@ -86,65 +324,6 @@ function updateTaskContainer(taskId, newContainerId) {
         .catch(error => {
             console.error("Erro:", error);
         });
-}
-/* end of drag n drop */
-
-function addContainer(containerId, containerName) {
-    const container = document.createElement("div");
-    const containerDiv = document.querySelector(".container-div");
-    
-    container.classList.add("container");
-    container.setAttribute("ondrop", "onDrop(event)");
-    container.setAttribute("ondragover", "onDragOver(event)");
-    container.setAttribute("id", containerId);
-
-    if (containerId && containerName) {
-
-        const title = document.createElement("h3");
-        title.textContent = containerName;
-        title.classList.add("container-title");
-        container.appendChild(title);
-
-        title.addEventListener("click", () => {
-            const input = document.createElement("input");
-            input.type = "text";
-            input.value = containerName;
-            input.classList.add("edit-container-name");
-            container.replaceChild(input, title);
-            input.focus();
-
-            const saveNewName = () => {
-                const newName = input.value.trim();
-                if (newName) {
-                    containerName = newName;
-                    title.textContent = newName;
-                    updateContainerNameOnDatabase(containerId, containerName);
-                }
-                container.replaceChild(title, input);
-            };
-
-            input.addEventListener("blur", saveNewName);
-            input.addEventListener("keypress", (event) => {
-                if (event.key === "Enter") {
-                    saveNewName();
-                }
-            });
-        });
-
-        const addButton = document.createElement("button");
-        addButton.textContent = "Add a card";
-        addButton.classList.add("add-card-button");
-        addButton.addEventListener("click", () => {
-            addButton.style.display = "none";
-            const inputForm = createCardInputForm(containerId, addButton);
-            container.appendChild(inputForm);
-        });
-
-        containerDiv.appendChild(container);
-        container.appendChild(addButton);
-    } else {
-        console.error(`Não foi possível criar o container, ${containerId} ou ${containerName} não possui valor.`);
-    }
 }
 
 function updateContainerNameOnDatabase(containerId, containerName) {
@@ -169,98 +348,6 @@ function updateContainerNameOnDatabase(containerId, containerName) {
         console.error('Erro:', error);
     });
 }
-
-/* Card forms */
-function createCardInputForm(containerId, addButton) {
-    const form = document.createElement("form");
-    form.setAttribute("id", "create-card-form");
-    form.classList.add("card-input-form");
-
-    const titleInput = document.createElement("input");
-    titleInput.classList.add("card-title-input");
-    titleInput.placeholder = "Enter a title for this card...";
-
-    const buttonContainer = document.createElement("div");
-    buttonContainer.classList.add("button-container");
-
-    const saveButton = document.createElement("button");
-    saveButton.textContent = "Add card";
-    saveButton.classList.add("submit-card-button");
-    saveButton.addEventListener("click", () => {
-        const title = titleInput.value.trim();
-        if (title) {
-            addCardToDatabase(title, "", containerId);
-            form.remove();
-            addButton.style.display = "block";
-        } else {
-            alert("Card title cannot be empty.");
-        }
-    });
-
-    const cancelButton = document.createElement("button");
-    cancelButton.innerHTML = "&times;";
-    cancelButton.classList.add("cancel-card-button");
-    cancelButton.addEventListener("click", () => {
-        form.remove();
-        addButton.style.display = "block";
-    });
-
-    buttonContainer.appendChild(saveButton);
-    buttonContainer.appendChild(cancelButton);
-
-    form.appendChild(titleInput);
-    form.appendChild(buttonContainer);
-
-    return form;
-}
-
-function createEditCardForm(card, containerId) {
-    const form = document.createElement("form");
-    form.setAttribute("id", "edit-card-form");
-    form.classList.add("card-input-form");
-
-    const titleInput = document.createElement("input");
-    titleInput.classList.add("card-title-input");
-    titleInput.value = card.querySelector(".card-title").textContent; // Preenche o input com o título atual
-
-    const buttonContainer = document.createElement("div");
-    buttonContainer.classList.add("button-container");
-
-    const saveButton = document.createElement("button");
-    saveButton.textContent = "Save";
-    saveButton.classList.add("submit-card-button");
-    saveButton.addEventListener("click", (e) => {
-        e.preventDefault();
-        const title = titleInput.value.trim();
-        if (title) {
-            updateCardInDatabase(card.getAttribute("data-task-id"), title, "");
-            form.remove();
-            card.style.display = "block";
-            card.querySelector(".card-title").textContent = title;
-        } else {
-            alert("Card title cannot be empty.");
-        }
-    });
-
-    const cancelButton = document.createElement("button");
-    cancelButton.innerHTML = "&times;";
-    cancelButton.classList.add("cancel-card-button");
-    cancelButton.addEventListener("click", (e) => {
-        e.preventDefault();
-        form.remove();
-        card.style.display = "block";
-    });
-
-    buttonContainer.appendChild(saveButton);
-    buttonContainer.appendChild(cancelButton);
-
-    form.appendChild(titleInput);
-    form.appendChild(buttonContainer);
-
-    return form;
-}
-
-/* end of card forms */
 
 function addCardToDatabase(title, description, containerId) {
     const taskData = {
@@ -289,8 +376,7 @@ function addCardToDatabase(title, description, containerId) {
         });
 }
 
-function updateCardInDatabase(taskId, newTitle, newDescription, containerId) {
-    // Função para atualizar o card no banco de dados
+function updateCardOnDatabase(taskId, newTitle, newDescription, containerId) {
     const taskData = {
         id: taskId,
         title: newTitle,
@@ -316,81 +402,6 @@ function updateCardInDatabase(taskId, newTitle, newDescription, containerId) {
             console.error('Erro:', error);
         });
 }
-
-function addCardToContainer(taskId, title, description, containerId) {
-    const card = document.createElement("div");
-    card.classList.add("card");
-    card.setAttribute("draggable", true);
-    card.setAttribute("ondragstart", "onDragStart(event)");
-    card.setAttribute("data-task-id", taskId);
-    card.setAttribute("id", `card-${taskId}`);
-    // card.setAttribute("id", incrementNextElementId('card'));
-
-
-    const content = cardContent(title, description);
-    card.appendChild(content);
-
-    const container = document.getElementById(containerId);
-
-    if (container) {
-        container.appendChild(card);
-    } else {
-        console.error(`Container with ID ${containerId} not found`);
-    }
-
-    const editButton = document.createElement("button");
-    editButton.classList.add("edit-btn");
-    editButton.innerHTML = "Edit";
-    editButton.addEventListener("click", () => {
-        card.style.display = "none";
-        const editForm = createEditCardForm(card, containerId);
-        card.parentElement.insertBefore(editForm, card.nextSibling);
-    });
-
-    card.appendChild(editButton);
-}
-
-function cardContent(title, description) {
-    const content = document.createElement("div");
-    const contentTitle = document.createElement("h4");
-    const contentDescription = document.createElement("p");
-
-    content.classList.add("card-content");
-    contentTitle.classList.add("card-title");
-    contentDescription.classList.add("card-description");
-
-    contentTitle.textContent = title;
-    contentDescription.textContent = description;
-
-    content.appendChild(contentTitle);
-    content.appendChild(contentDescription);
-
-    return content;
-}
-
-function incrementNextElementId(elementIdPrefix) {
-    const elements = document.querySelectorAll(`[id^='${elementIdPrefix}']`);
-
-    if (elements.length > 0) {
-        let maxSuffix = 0;
-
-        elements.forEach(element => {
-            const id = element.id;
-            const suffix = parseInt(id.split('-')[1]);
-
-            if (!isNaN(suffix) && suffix > maxSuffix) {
-                maxSuffix = suffix;
-            }
-        });
-
-        const nextId = `${elementIdPrefix}-${maxSuffix + 1}`;
-        return nextId;
-    } else {
-        return `${elementIdPrefix}-1`;
-    }
-}
-
-var uri = "http://localhost:3000";
 
 document.addEventListener("DOMContentLoaded", function () {
     fetch(`${uri}/containers`)
@@ -431,3 +442,5 @@ document.addEventListener("DOMContentLoaded", function () {
         });
     }
 });
+
+/* END OF REQUESTS */

@@ -9,6 +9,17 @@
     padding: 10px;
 }
 
+.container-title {
+    cursor: pointer;
+}
+
+.edit-container-title {
+    width: 100%;
+    box-sizing: border-box;
+    padding: 5px;
+    font-size: 1.2em;
+}
+
 .container-div {
     display: flex;
     justify-content: space-around;
