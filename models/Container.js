@@ -22,8 +22,6 @@ class ContainerModel {
         });
     }
 
-    // TODO: add moveContainer
-
     static createContainer(name) {
         return new Promise((resolve, reject) => {
             if (!name) {

@@ -88,9 +88,17 @@ function createButtonElement(text, className, clickHandler) {
     button.addEventListener("click", clickHandler);
     return button;
 }
-/* END OF UTILS */
 
-/* CARDS */
+function createContainerElement(containerId) {
+    const container = document.createElement("div");
+    container.classList.add("container");
+    container.setAttribute("ondrop", "onDrop(event)");
+    container.setAttribute("ondragover", "onDragOver(event)");
+    container.setAttribute("id", containerId);
+
+    return container;
+}
+
 function createCardElement(taskId, title, description) {
     const card = document.createElement("div");
     card.classList.add("card");
@@ -104,6 +112,9 @@ function createCardElement(taskId, title, description) {
 
     return card;
 }
+/* END OF UTILS */
+
+/* CARDS */
 
 function createEditButton(card, containerId) {
     const editButton = document.createElement("button");
@@ -152,7 +163,7 @@ function cardContent(title, description) {
 
 function createFormContainer() {
     const form = document.createElement("form");
-    form.classList.add("card-input-form");
+    form.classList.add("input-form");
 
     const buttonContainer = document.createElement("div");
     buttonContainer.classList.add("button-container");
@@ -168,7 +179,7 @@ function createCardInputForm(containerId, addButton) {
 
     const titleInput = createInputElement("card-title-input", "Enter a title for this card...");
 
-    const saveButton = createButtonElement("Add card", "submit-card-button", () => {
+    const saveButton = createButtonElement("Add card", "submit-button", () => {
         const title = titleInput.value.trim();
         if (title) {
             addCardToDatabase(title, "", containerId);
@@ -179,7 +190,7 @@ function createCardInputForm(containerId, addButton) {
         }
     });
 
-    const cancelButton = createButtonElement("&times;", "cancel-card-button", () => {
+    const cancelButton = createButtonElement("&times;", "cancel-button", () => {
         form.remove();
         addButton.style.display = "block";
     });
@@ -192,13 +203,13 @@ function createCardInputForm(containerId, addButton) {
     return form;
 }
 
-function createEditCardForm(card, containerId) {
+function createEditCardForm(card) {
     const { form, buttonContainer } = createFormContainer();
     form.setAttribute("id", "edit-card-form");
 
     const titleInput = createInputElement("card-title-input", '', card.querySelector(".card-title").textContent);
 
-    const saveButton = createButtonElement("Save", "submit-card-button", (e) => {
+    const saveButton = createButtonElement("Save", "submit-button", (e) => {
         e.preventDefault();
         const title = titleInput.value.trim();
         if (title) {
@@ -211,7 +222,7 @@ function createEditCardForm(card, containerId) {
         }
     });
 
-    const cancelButton = createButtonElement("&times;", "cancel-card-button", (e) => {
+    const cancelButton = createButtonElement("&times;", "cancel-button", (e) => {
         e.preventDefault();
         form.remove();
         card.style.display = "block";
@@ -228,14 +239,49 @@ function createEditCardForm(card, containerId) {
 /* END OF CARDS */
 
 /* CONTAINERS */
-function createContainerElement(containerId, containerName) {
-    const container = document.createElement("div");
-    container.classList.add("container");
-    container.setAttribute("ondrop", "onDrop(event)");
-    container.setAttribute("ondragover", "onDragOver(event)");
-    container.setAttribute("id", containerId);
 
-    return container;
+function createAddContainerBtn() {
+    const addContainerButton = createButtonElement("Add a new list", "add-container-btn", () => {
+        addContainerButton.style.display = "none";
+        const inputForm = createContainerInputForm(addContainerButton);
+        addContainerButton.parentElement.appendChild(inputForm);
+    })
+
+    const containerBtnDiv = document.querySelector("#container-btn-div");
+    containerBtnDiv.appendChild(addContainerButton);
+    
+    return addContainerButton;
+}
+
+function createContainerInputForm(addContainerButton) {
+    const { form, buttonContainer } = createFormContainer();
+    form.setAttribute("id", "create-container-form");
+
+    const nameInput = createInputElement("container-title-input", "Enter list title...");
+
+    const saveButton = createButtonElement("Add list", "submit-button", () => {
+        const name = nameInput.value.trim();
+        if (name) {
+            addContainerToDatabase(name);
+            form.remove();
+            addContainerButton.style.display = "block";
+        } else {
+            alert("List title cannot be empty.");
+        }
+    });
+
+    const cancelButton = createButtonElement("&times;", "cancel-button", (e) => {
+        e.preventDefault();
+        form.remove();
+        addContainerButton.style.display = "block";
+    });
+
+    buttonContainer.appendChild(saveButton);
+    buttonContainer.appendChild(cancelButton);
+
+    form.appendChild(nameInput);
+
+    return form;
 }
 
 function createContainerTitle(containerName, containerId) {
@@ -296,7 +342,7 @@ function addContainer(containerId, containerName) {
     }
 
     const containerDiv = document.querySelector(".container-div");
-    const container = createContainerElement(containerId, containerName);
+    const container = createContainerElement(containerId);
     const title = createContainerTitle(containerName, containerId);
     const addButton = createAddCardButton(containerId);
 
@@ -347,6 +393,31 @@ function updateContainerNameOnDatabase(containerId, containerName) {
     .catch(error => {
         console.error('Erro:', error);
     });
+}
+
+function addContainerToDatabase(name) {
+    const data = { name: name };
+
+    fetch(`${uri}/containers/create`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(data)
+    })
+        .then(response => response.json())
+        .then(data => {
+            if (data.message === "success") {
+                addContainer(data.data.id, name);
+            } else {
+                console.log(data)
+                console.error('Erro ao criar o container');
+            }
+        })
+        .catch(error => {
+            console.error('Erro:', error);
+        });
+
 }
 
 function addCardToDatabase(title, description, containerId) {
@@ -404,6 +475,8 @@ function updateCardOnDatabase(taskId, newTitle, newDescription, containerId) {
 }
 
 document.addEventListener("DOMContentLoaded", function () {
+    createAddContainerBtn();
+
     fetch(`${uri}/containers`)
         .then(response => response.json())
         .then(data => {

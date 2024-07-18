@@ -22,8 +22,8 @@ class ContainerController {
             const newContainer = await ContainerModel.createContainer(name);
 
             res.json({
-                message: "Container criado com sucesso",
-                data: newContainer
+                "message": "success",
+                "data": newContainer
             });
         } catch (err) {
             res.status(500).json({ message: "Erro interno no servidor", error: err.message });
@@ -37,8 +37,8 @@ class ContainerController {
             await ContainerModel.deleteContainer(id);
 
             res.json({
-                message: "success",
-                data: { id }
+                "message": "success",
+                "data": { id }
             });
         } catch (err) {
             res.status(500).json({ message: "Erro interno no servidor", error: err.message });
@@ -55,8 +55,8 @@ class ContainerController {
             const updatedContainer = await ContainerModel.updateContainerName(id, name);
 
             res.json({
-                message: "success",
-                data: updatedContainer
+                "message": "success",
+                "data": updatedContainer
             });
         } catch (err) {
             if (err.message === "Container não encontrado!") {
