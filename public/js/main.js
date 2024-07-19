@@ -434,7 +434,31 @@ function addContainerToDatabase(name) {
         .catch(error => {
             console.error('Erro:', error);
         });
+}
 
+function deleteContainerFromDatabase(containerId) {
+    fetch(`${uri}/containers/${containerId}`, {
+        method: 'DELETE',
+        headers: {
+            'Content-Type': 'application/json'
+        }
+    })
+    .then(response => {
+        if (!response.ok) {
+            throw new Error('Erro ao deletar o container e suas tasks.');
+        }
+        return response.json();
+    })
+    .then(data => {
+        if (data.message === "success") {
+            console.log(`Container ${containerId} e suas tasks foram deletados com sucesso.`);
+        } else {
+            console.error('Erro ao deletar o container e suas tasks:', data.error);
+        }
+    })
+    .catch(error => {
+        console.error('Erro:', error);
+    });
 }
 
 function addCardToDatabase(title, description, containerId) {

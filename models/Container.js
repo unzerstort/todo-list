@@ -49,20 +49,53 @@ class ContainerModel {
                 reject(new Error("O ID do container é obrigatório!"));
                 return;
             }
-
-            const sql = "DELETE FROM container WHERE id = ?";
-            const params = [id];
-
-            db.run(sql, params, function (err) {
-                if (err) {
-                    reject(err);
-                    return;
-                }
-
-                resolve({ id });
+    
+            const deleteTaskSql = "DELETE FROM task WHERE container_id = ?";
+            const deleteContainerSql = "DELETE FROM container WHERE id = ?";
+    
+            db.serialize(() => {
+                db.run("BEGIN TRANSACTION");
+    
+                db.run(deleteTaskSql, [id], function (err) {
+                    if (err) {
+                        db.run("ROLLBACK", (rollbackErr) => {
+                            if (rollbackErr) {
+                                console.error("Erro ao fazer rollback:", rollbackErr);
+                            }
+                            reject(err);
+                        });
+                        return;
+                    }
+    
+                    db.run(deleteContainerSql, [id], function (err) {
+                        if (err) {
+                            db.run("ROLLBACK", (rollbackErr) => {
+                                if (rollbackErr) {
+                                    console.error("Erro ao fazer rollback:", rollbackErr);
+                                }
+                                reject(err);
+                            });
+                            return;
+                        }
+    
+                        db.run("COMMIT", (commitErr) => {
+                            if (commitErr) {
+                                db.run("ROLLBACK", (rollbackErr) => {
+                                    if (rollbackErr) {
+                                        console.error("Erro ao fazer rollback:", rollbackErr);
+                                    }
+                                    reject(commitErr);
+                                });
+                                return;
+                            }
+                            resolve({ id });
+                        });
+                    });
+                });
             });
         });
     }
+    
 
     static updateContainerName(id, name) {
         return new Promise((resolve, reject) => {
