@@ -31,7 +31,7 @@ app.get(`/containers`, ContainerController.listContainers);
 app.post(`/tasks/create`, TaskController.createTask);
 app.post(`/containers/create`, ContainerController.createContainer);
 
-app.delete(`/tasks/:id`, TaskController.deleteTask);
+app.delete(`/tasks/delete/:id`, TaskController.deleteTask);
 app.delete(`/containers/:id`, ContainerController.deleteContainer);
 
 app.put(`/tasks/move`, TaskController.updateContainerId);

@@ -43,10 +43,18 @@
     display: block;
 }
 
+.card:hover .delete-btn {
+    display: block;
+}
+
 .card.dragging {
     opacity: 0.5;
 }
 
 .edit-btn {
+    display: none;
+}
+
+.delete-btn {
     display: none;
 }

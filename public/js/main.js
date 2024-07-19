@@ -128,6 +128,20 @@ function createEditButton(card, containerId) {
     return editButton;
 }
 
+function createDeleteButton(card, taskId) {
+    const deleteButton = createButtonElement("Delete", "delete-btn",  (e) => {
+        if (confirm("Are you sure you want to delete this card?")) {
+            // Remove card from DOM
+            card.remove();
+
+            // Remove task from database
+            deleteTaskFromDatabase(taskId);
+        }
+    });
+
+    return deleteButton;
+}
+
 function addCardToContainer(taskId, title, description, containerId) {
     const card = createCardElement(taskId, title, description);
 
@@ -141,6 +155,9 @@ function addCardToContainer(taskId, title, description, containerId) {
 
     const editButton = createEditButton(card, containerId);
     card.appendChild(editButton);
+
+    const deleteButton = createDeleteButton(card, taskId);
+    card.appendChild(deleteButton);
 }
 
 function cardContent(title, description) {
@@ -472,6 +489,24 @@ function updateCardOnDatabase(taskId, newTitle, newDescription, containerId) {
         .catch(error => {
             console.error('Erro:', error);
         });
+}
+
+function deleteTaskFromDatabase(taskId) {
+    fetch(`${uri}/tasks/delete/${taskId}`, {
+        method: 'DELETE',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.message !== "success") {
+            console.error('Erro ao deletar a tarefa.');
+        }
+    })
+    .catch(error => {
+        console.error('Erro:', error);
+    });
 }
 
 document.addEventListener("DOMContentLoaded", function () {
