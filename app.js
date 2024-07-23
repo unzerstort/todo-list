@@ -15,7 +15,7 @@ app.use((req, res, next) => {
         "Access-Control-Allow-Headers",
         "Origin, X-Requested-With, Content-Type, Accept"
     );
-    res.setHeader("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
+    res.setHeader("Access-Control-Allow-Methods", "GET, POST, PUT, PATCH, DELETE, OPTIONS");
     next();
 });
 
@@ -34,7 +34,7 @@ app.post(`/containers/create`, ContainerController.createContainer);
 app.delete(`/tasks/delete/:id`, TaskController.deleteTask);
 app.delete(`/containers/delete/:id`, ContainerController.deleteContainer);
 
-app.put(`/tasks/move`, TaskController.updateContainerId);
+app.patch(`/tasks/:id/move`, TaskController.updateContainerId);
 app.put(`/tasks/update`, TaskController.updateTask);
 app.put(`/containers/update`, ContainerController.updateContainerName);
 

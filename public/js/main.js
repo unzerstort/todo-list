@@ -59,13 +59,12 @@ function onDrop(ev) {
 
     if (ev.target.className === "container") {
         ev.target.appendChild(document.getElementById(cardId));
-
     }
 
     if (card && newContainerId.startsWith("container-")) {
         ev.target.appendChild(card);
         const taskId = card.getAttribute("data-task-id");
-
+        
         // Update the container_id in the database
         updateTaskContainer(taskId, newContainerId.split("-")[1]);
     }
@@ -94,7 +93,7 @@ function createContainerElement(containerId) {
     container.classList.add("container");
     container.setAttribute("ondrop", "onDrop(event)");
     container.setAttribute("ondragover", "onDragOver(event)");
-    container.setAttribute("id", containerId);
+    container.setAttribute("id", `container-${containerId}`);
 
     return container;
 }
@@ -371,8 +370,8 @@ function addContainer(containerId, containerName) {
 
 /* REQUESTS */
 function updateTaskContainer(taskId, newContainerId) {
-    fetch(`${uri}/tasks/move`, {
-        method: "PUT",
+    fetch(`${uri}/tasks/${taskId}/move`, {
+        method: "PATCH",
         headers: {
             "Content-Type": "application/json"
         },
@@ -402,7 +401,6 @@ function updateContainerNameOnDatabase(containerId, containerName) {
     })
     .then(response => response.json())
     .then(data => {
-        console.log(data);
         if (data.message !== "success") {
             console.error('Erro ao atualizar o nome do container.');
         }
@@ -427,7 +425,6 @@ function addContainerToDatabase(name) {
             if (data.message === "success") {
                 addContainer(data.data.id, name);
             } else {
-                console.log(data)
                 console.error('Erro ao criar o container');
             }
         })
@@ -465,7 +462,7 @@ function addCardToDatabase(title, description, containerId) {
     const taskData = {
         title: title,
         description: description,
-        container_id: parseInt(containerId.split("-")[1])
+        container_id: containerId
     };
 
     fetch(`${uri}/tasks/create`, {
@@ -533,20 +530,27 @@ function deleteTaskFromDatabase(taskId) {
     });
 }
 
-document.addEventListener("DOMContentLoaded", function () {
-    createAddContainerBtn();
+createAddContainerBtn();
+fetchContainers();
+fetchTasks();
 
+function fetchContainers() {
     fetch(`${uri}/containers`)
         .then(response => response.json())
         .then(data => {
             if (data.message === "success") {
                 renderContainers(data.data);
-
-                return fetch(`${uri}/tasks`);
             } else {
                 throw new Error('Erro ao obter containers');
             }
         })
+        .catch(error => {
+            console.error('Erro:', error);
+        });
+}
+
+function fetchTasks() {
+    fetch(`${uri}/tasks`)
         .then(response => response.json())
         .then(data => {
             if (data.message === "success") {
@@ -558,21 +562,21 @@ document.addEventListener("DOMContentLoaded", function () {
         .catch(error => {
             console.error('Erro:', error);
         });
+}
 
-    function renderContainers(containers) {
-        containers.forEach(container => {
-            const containerId = `container-${container.id}`;
-            const containerName = `${container.name}`
-            addContainer(containerId, containerName);
-        });
-    }
+function renderContainers(containers) {
+    containers.forEach(container => {
+        const containerId = container.id;
+        const containerName = `${container.name}`
+        addContainer(containerId, containerName);
+    });
+}
 
-    function renderTasks(tasks) {
-        tasks.forEach(task => {
-            const containerId = `container-${task.container_id}`;
-            addCardToContainer(task.id, task.title, task.description, containerId);
-        });
-    }
-});
+function renderTasks(tasks) {
+    tasks.forEach(task => {
+        const containerId = `container-${task.container_id}`;
+        addCardToContainer(task.id, task.title, task.description, containerId);
+    });
+}
 
 /* END OF REQUESTS */
