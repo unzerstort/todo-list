@@ -115,13 +115,13 @@ function createCardElement(taskId, title, description) {
 
 /* CARDS */
 
-function createEditButton(card, containerId) {
+function createEditButton(card) {
     const editButton = document.createElement("button");
     editButton.classList.add("edit-btn");
     editButton.innerHTML = "Edit";
     editButton.addEventListener("click", () => {
         card.style.display = "none";
-        const editForm = createEditCardForm(card, containerId);
+        const editForm = createEditCardForm(card);
         card.parentElement.insertBefore(editForm, card.nextSibling);
     });
     return editButton;
@@ -144,7 +144,8 @@ function createDeleteButton(card, taskId) {
 function addCardToContainer(taskId, title, description, containerId) {
     const card = createCardElement(taskId, title, description);
 
-    const container = document.getElementById(containerId);
+    const container = document.getElementById(`container-${containerId}`);
+    
     if (container) {
         container.appendChild(card);
     } else {
@@ -152,7 +153,7 @@ function addCardToContainer(taskId, title, description, containerId) {
         return;
     }
 
-    const editButton = createEditButton(card, containerId);
+    const editButton = createEditButton(card);
     card.appendChild(editButton);
 
     const deleteButton = createDeleteButton(card, taskId);
@@ -269,6 +270,30 @@ function createAddContainerBtn() {
     return addContainerButton;
 }
 
+function createDeleteContainerButton(containerId) {
+    const deleteButton = document.createElement("button");
+    deleteButton.textContent = "Delete";
+    deleteButton.classList.add("delete-container-button");
+
+    deleteButton.addEventListener("click", () => {
+        if (confirm("Are you sure you want to delete this list?")) {
+            deleteContainer(containerId);
+        }
+    });
+
+    return deleteButton;
+}
+
+function deleteContainer(containerId) {
+    const container = document.getElementById(`container-${containerId}`);
+    if (container) {
+        container.remove();
+        deleteContainerFromDatabase(containerId);
+    } else {
+        console.error(`Container with ID ${containerId} not found`);
+    }
+}
+
 function createContainerInputForm(addContainerButton) {
     const { form, buttonContainer } = createFormContainer();
     form.setAttribute("id", "create-container-form");
@@ -361,9 +386,11 @@ function addContainer(containerId, containerName) {
     const container = createContainerElement(containerId);
     const title = createContainerTitle(containerName, containerId);
     const addButton = createAddCardButton(containerId);
+    const deleteButton = createDeleteContainerButton(containerId);
 
     container.appendChild(title);
-    container.appendChild(addButton);
+    container.appendChild(addButton); 
+    container.appendChild(deleteButton);
     containerDiv.appendChild(container);
 }
 /* END OF CONTAINERS */
@@ -434,7 +461,7 @@ function addContainerToDatabase(name) {
 }
 
 function deleteContainerFromDatabase(containerId) {
-    fetch(`${uri}/containers/${containerId}`, {
+    fetch(`${uri}/containers/delete/${containerId}`, {
         method: 'DELETE',
         headers: {
             'Content-Type': 'application/json'
@@ -574,8 +601,7 @@ function renderContainers(containers) {
 
 function renderTasks(tasks) {
     tasks.forEach(task => {
-        const containerId = `container-${task.container_id}`;
-        addCardToContainer(task.id, task.title, task.description, containerId);
+        addCardToContainer(task.id, task.title, task.description, task.container_id);
     });
 }
 
