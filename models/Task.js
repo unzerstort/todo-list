@@ -1,9 +1,8 @@
 import db from "../config/database.js";
 
 class Task {
-    constructor(title, description, container_id) {
+    constructor(title, container_id) {
         this.title = title;
-        this.description = description;
         this.container_id = container_id;
     }
 }
@@ -26,16 +25,16 @@ class TaskModel {
         });
     }
 
-    static createTask(title, description, container_id) {
+    static createTask(title, container_id) {
         return new Promise((resolve, reject) => {
             if (!title || !container_id) {
                 reject(new Error("O título e o ID do container são obrigatórios!"));
                 return;
             }
 
-            const task = new Task(title, description, container_id);
-            const sql = "INSERT INTO task (title, description, container_id) VALUES (?, ?, ?)";
-            const params = [task.title, task.description, task.container_id];
+            const task = new Task(title, container_id);
+            const sql = "INSERT INTO task (title, container_id) VALUES (?, ?)";
+            const params = [task.title, task.container_id];
 
             db.run(sql, params, function (err) {
                 if (err) {
@@ -47,7 +46,7 @@ class TaskModel {
         });
     }
 
-    static updateTask(id, newTitle, newDescription) {
+    static updateTask(id, newTitle) {
         return new Promise((resolve, reject) => {
             const checkSql = "SELECT * FROM task WHERE id = ?";
             db.get(checkSql, [id], (err, row) => {
@@ -61,8 +60,8 @@ class TaskModel {
                     return;
                 }
 
-                const updateSql = "UPDATE task SET title = ?, description = ? WHERE id = ?";
-                const params = [newTitle, newDescription, id];
+                const updateSql = "UPDATE task SET title = ? WHERE id = ?";
+                const params = [newTitle, id];
 
                 db.run(updateSql, params, function (err) {
                     if (err) {
@@ -70,7 +69,7 @@ class TaskModel {
                         return;
                     }
 
-                    resolve({ id, title: newTitle, description: newDescription });
+                    resolve({ id, title: newTitle });
                 });
             });
         });

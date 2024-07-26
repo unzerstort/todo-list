@@ -18,9 +18,9 @@ class TaskController {
 
     static createTask = async (req, res) => {
         try {
-            const { title, description, container_id } = req.body;
+            const { title, container_id } = req.body;
 
-            const newTask = await TaskModel.createTask(title, description, container_id);
+            const newTask = await TaskModel.createTask(title, container_id);
 
             res.json({
                 message: "success",
@@ -33,12 +33,12 @@ class TaskController {
 
     static updateTask = async (req, res) => {
         try {
-            const { id, title, description } = req.body;
+            const { id, title } = req.body;
             if (!id) {
                 return res.status(400).json({ message: "O ID da tarefa é obrigatório!" });
             }
 
-            const updatedTask = await TaskModel.updateTask(id, title, description);
+            const updatedTask = await TaskModel.updateTask(id, title);
 
             res.json({
                 message: "success",
