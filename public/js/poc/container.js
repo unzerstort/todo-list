@@ -1,3 +1,4 @@
+import { createContainerElement } from "./objectBuilder.js";
 
 export function renderContainers(containers) {
     let containerList = [];
@@ -17,10 +18,9 @@ export function addContainer(containerId, containerName) {
     }
 
     const containerDiv = document.querySelector(".container-div");
-    
-    const h3 = document.createElement("h3"); //TODO: mover criação de h3 p objectBuilder
-    h3.innerHTML = containerName;
-    containerDiv.appendChild(h3);
+    const container = createContainerElement(containerId, containerName);
 
-    return containerDiv;
+    containerDiv.appendChild(container);
+
+    return container;
 }
