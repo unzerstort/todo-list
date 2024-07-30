@@ -3,9 +3,9 @@ import { createContainerElement } from "./objectBuilder.js";
 export function renderContainers(containers) {
     let containerList = [];
     containers.forEach(container => {
-        const containerDiv = addContainer(container.id, container.name);
+        const containerElement = addContainer(container.id, container.name);
 
-        containerList.push(containerDiv);
+        containerList.push(containerElement);
     });
 
     return containerList;
