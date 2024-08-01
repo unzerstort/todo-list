@@ -1,3 +1,5 @@
+import { moveCardToContainer } from "./tasks.js";
+
 const cards = document.querySelectorAll('.card');
 const containers = document.querySelectorAll('.container');
 
@@ -40,7 +42,6 @@ export function getDragAfterElement(container, y) {
 
 export function onDragOver(ev) {
     ev.preventDefault();
-    ev.dataTransfer.dropEffect = "move";
 }
 
 export function onDragStart(ev) {

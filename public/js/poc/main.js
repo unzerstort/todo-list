@@ -4,6 +4,18 @@ import { renderTasks } from "../tasks.js";
 
 document.addEventListener("DOMContentLoaded", () => {
     fetchContainers()
+    .then((response) => {
+        if (response.status === 200) {
+            return response.json();
+        } else {
+            throw new Error("Something went wrong on API server!");
+        }
+    })
+    .then(data => {
+        return renderContainers(data.data);
+    })
+    .then(() => {
+        fetchTasks()
         .then((response) => {
             if (response.status === 200) {
                 return response.json();
@@ -12,23 +24,10 @@ document.addEventListener("DOMContentLoaded", () => {
             }
         })
         .then(data => {
-            return renderContainers(data.data);
+            return renderTasks(data.data);
         })
-        .then(() => {
-            fetchTasks()
-            .then((response) => {
-                if (response.status === 200) {
-                    return response.json();
-                } else {
-                    throw new Error("Something went wrong on API server!");
-                }
-            })
-            .then(data => {
-                console.log(data)
-                return renderTasks(data.data);
-            })
-        })
-        .catch(error => {
-            console.log("catch: " + error);
-        });
+    })
+    .catch(error => {
+        console.log("catch: " + error);
+    });
 })

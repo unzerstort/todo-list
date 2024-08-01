@@ -1,4 +1,5 @@
 import { createCardElement } from "./poc/objectBuilder.js";
+import { updateTaskContainer } from "./poc/requests.js";
 
 export function renderTasks(tasks) {
     let cardList = [];
@@ -25,11 +26,6 @@ export function addCard(taskId, taskTitle, containerId) {
     }
 
     return card;
-}
-
-export function assignCardToContainer(taskId, containerId) {
-    const container = document.getElementById(`${containerId}`);
-    
 }
 
 export function moveCardToContainer(taskId, containerId) {

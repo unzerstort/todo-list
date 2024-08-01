@@ -1,9 +1,10 @@
+import { onDrop, onDragOver, onDragStart } from "../draggable.js";
 
 export function createContainerElement(containerId, containerName) {
     const container = document.createElement("div");
     container.classList.add("container");
-    container.setAttribute("ondrop", "onDrop(event)");
-    container.setAttribute("ondragover", "onDragOver(event)");
+    container.addEventListener("dragover", onDragOver);
+    container.addEventListener("drop", onDrop);
     container.setAttribute("id", `container-${containerId}`);
 
     const name = document.createElement("h3");
@@ -19,7 +20,7 @@ export function createCardElement(taskId, title) {
     const card = document.createElement("div");
     card.classList.add("card");
     card.setAttribute("draggable", true);
-    card.setAttribute("ondragstart", "onDragStart(event)");
+    card.addEventListener("dragstart", onDragStart);
     card.setAttribute("data-task-id", taskId);
     card.setAttribute("id", `card-${taskId}`);
 

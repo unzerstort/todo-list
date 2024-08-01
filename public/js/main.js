@@ -1,24 +1,6 @@
 import {  moveCardToContainer, createFormContainer, createCardInputForm } from "./tasks.js";
 import { createInputElement, createButtonElement, createContainerElement, createCardElement, createEditButton, createDeleteButton } from "./utils.js";
 
-
-/* start of drag n drop */
-
-/* end of drag n drop */
-
-export function addCardToContainer(taskId, title, containerId) {
-    const card = createCardElement(taskId, title);
-
-    const container = document.getElementById(`container-${containerId}`);
-    
-    if (container) {
-        container.appendChild(card);
-    } else {
-        console.error(`Container with ID ${containerId} not found`);
-        return;
-    }
-}
-
 /* REQUESTS */
 export function updateTaskContainer(taskId, newContainerId) {
     const idNum = parseInt(newContainerId.split("-")[1]);
