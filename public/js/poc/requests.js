@@ -1,6 +1,6 @@
+import { addCard } from "../tasks.js";
 
 var uri = "http://localhost:3000";
-
 
 export async function fetchContainers() {
     return fetch(`${uri}/containers`)
@@ -28,5 +28,75 @@ export function updateTaskContainer(taskId, newContainerId) {
         })
         .catch(error => {
             console.error("Erro:", error);
+        });
+}
+
+export function deleteTaskFromDatabase(taskId) {
+    fetch(`${uri}/tasks/delete/${taskId}`, {
+        method: 'DELETE',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.message !== "success") {
+            console.error('Erro ao deletar a tarefa.');
+        }
+    })
+    .catch(error => {
+        console.error('Erro:', error);
+    });
+}
+
+export function updateTaskOnDatabase(taskId, newTitle, containerId) {
+    const taskData = {
+        id: taskId,
+        title: newTitle,
+        container_id: containerId
+    };
+
+    fetch(`${uri}/tasks/update`, {
+        method: 'PATCH',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(taskData)
+    })
+        .then(response => response.json())
+        .then(data => {
+            console.log(data);
+            if (data.message !== "success") {
+                console.error('Erro ao atualizar a tarefa');
+            }
+        })
+        .catch(error => {
+            console.error('Erro:', error);
+        });
+}
+
+export function addTaskToDatabase(title, containerId) {
+    const taskData = {
+        title: title,
+        container_id: containerId
+    };
+
+    fetch(`${uri}/tasks/create`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(taskData)
+    })
+        .then(response => response.json())
+        .then(data => {
+            if (data.message === "success") {
+                addCard(data.data.id, title, containerId);
+            } else {
+                console.error('Erro ao criar a tarefa');
+            }
+        })
+        .catch(error => {
+            console.error('Erro:', error);
         });
 }

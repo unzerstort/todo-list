@@ -1,4 +1,3 @@
-import { } from ""
 
 export function createInputElement(className, placeholder = '', value = '') {
     const input = document.createElement("input");

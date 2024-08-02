@@ -35,7 +35,7 @@ app.delete(`/tasks/delete/:id`, TaskController.deleteTask);
 app.delete(`/containers/delete/:id`, ContainerController.deleteContainer);
 
 app.patch(`/tasks/:id/move`, TaskController.updateContainerId);
-app.put(`/tasks/update`, TaskController.updateTask);
+app.patch(`/tasks/update`, TaskController.updateTask);
 app.put(`/containers/update`, ContainerController.updateContainerName);
 
 app.listen(port, () => {
