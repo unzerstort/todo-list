@@ -1,4 +1,5 @@
 import { addCard } from "../tasks.js";
+import { addContainer } from "./container.js";
 
 var uri = "http://localhost:3000";
 
@@ -65,7 +66,6 @@ export function updateTaskOnDatabase(taskId, newTitle, containerId) {
     })
         .then(response => response.json())
         .then(data => {
-            console.log(data);
             if (data.message !== "success") {
                 console.error('Erro ao atualizar a tarefa');
             }
@@ -99,4 +99,49 @@ export function addTaskToDatabase(title, containerId) {
         .catch(error => {
             console.error('Erro:', error);
         });
+}
+
+export function addContainerToDatabase(name) {
+    const data = { name: name };
+
+    fetch(`${uri}/containers/create`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(data)
+    })
+        .then(response => response.json())
+        .then(data => {
+            if (data.message === "success") {
+                addContainer(data.data.id, name);
+            } else {
+                console.error('Erro ao criar o container');
+            }
+        })
+        .catch(error => {
+            console.error('Erro:', error);
+        });
+}
+
+export function updateContainerOnDatabase(containerId, containerName) {
+    const data = { id: containerId, name: containerName };
+
+    fetch(`${uri}/containers/update`, {
+        method: 'PATCH',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(data)
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.message !== "success") {
+            console.log(containerName)
+            console.error('Erro ao atualizar o nome do container.');
+        }
+    })
+    .catch(error => {
+        console.error('Erro:', error);
+    });
 }

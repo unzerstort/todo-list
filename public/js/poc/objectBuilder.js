@@ -1,5 +1,5 @@
 import { onDrop, onDragOver, onDragStart } from "../draggable.js";
-import { deleteTaskFromDatabase, addTaskToDatabase, updateTaskOnDatabase } from "./requests.js";
+import { deleteTaskFromDatabase, addTaskToDatabase, updateTaskOnDatabase, addContainerToDatabase, updateContainerOnDatabase } from "./requests.js";
 import { createInputElement } from "../utils.js";
 
 export function createContainerElement(containerId, containerName) {
@@ -13,12 +13,37 @@ export function createContainerElement(containerId, containerName) {
     name.classList.add("container-name");
     name.innerHTML = `${containerName}`;
 
+    name.addEventListener("click", () => handleTitleClick(name, containerName, containerId));
+
     const addCardBtn = createAddCardBtn(containerId);
     
     container.appendChild(name);
     container.appendChild(addCardBtn);
 
     return container;
+}
+
+export function handleTitleClick(title, containerName, containerId) {
+    const input = createInputElement("edit-container-name", "", `${containerName}`);
+    title.replaceWith(input);
+    input.focus();
+
+    const saveNewName = () => {
+        const newName = input.value.trim();
+        if (newName) {
+            containerName = newName;
+            title.textContent = newName;
+            updateContainerOnDatabase(containerId, newName);
+        }
+        input.replaceWith(title);
+    };
+
+    input.addEventListener("blur", saveNewName);
+    input.addEventListener("keypress", (event) => {
+        if (event.key === "Enter") {
+            saveNewName();
+        }
+    });
 }
 
 export function createCardElement(taskId, title) {
@@ -143,13 +168,55 @@ export function createButtonElement(text, className, clickHandler) {
 }
 
 export function createAddCardBtn(containerId) {
-    const addCardBtn = createButtonElement("Add a card", "add-button", () => {
+    const addCardBtn = createButtonElement("&plus; Add a card", "add-button", () => {
         addCardBtn.style.display = "none";
         const inputForm = createCardInputForm(containerId, addCardBtn);
         addCardBtn.parentElement.appendChild(inputForm);
     })
 
     return addCardBtn;
+}
+
+export function createAddContainerBtn() {
+    const addContainerBtn = createButtonElement("&plus; Add another list", "add-container-button", () => {
+        addContainerBtn.style.display = "none";
+        const inputForm = createContainerInputForm(addContainerBtn);
+        addContainerBtn.parentElement.appendChild(inputForm);
+    })
+
+    return addContainerBtn;
+}
+
+export function createContainerInputForm(addButton) {
+    const { form, buttonContainer } = createFormContainer();
+    form.setAttribute("id", "create-container-form");
+
+    const titleInput = createInputElement("container-title-input", "Enter list title...");
+
+    const saveButton = createButtonElement("Add list", "submit-button", () => {
+        const title = titleInput.value.trim();
+        if (title) {
+            addContainerToDatabase(title);
+            form.remove();
+            addButton.style.display = "block";
+        } else {
+            alert("Container title cannot be empty.");
+        }
+    });
+
+    const cancelButton = createButtonElement("&times;", "cancel-button", () => {
+        form.remove();
+        addButton.style.display = "block";
+    });
+
+    buttonContainer.appendChild(saveButton);
+    buttonContainer.appendChild(cancelButton);
+
+    form.appendChild(titleInput);
+
+    form.insertBefore(buttonContainer, titleInput.nextSibling);
+
+    return form;
 }
 
 export function createFormContainer() {

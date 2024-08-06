@@ -1,4 +1,5 @@
-import { createContainerElement } from "./objectBuilder.js";
+import { createAddContainerBtn, createContainerElement } from "./objectBuilder.js";
+import { createInputElement } from "../utils.js";
 
 export function renderContainers(containers) {
     let containerList = [];
@@ -24,3 +25,16 @@ export function addContainer(containerId, containerName) {
 
     return container;
 }
+
+export function renderNewContainerBtn() {
+    const addContainerBtn = createAddContainerBtn();
+    const addContainerBtnDiv = document.querySelector(".container-btn-div");
+    addContainerBtnDiv.appendChild(addContainerBtn);
+
+    return addContainerBtnDiv;
+}
+
+document.addEventListener("DOMContentLoaded", () => {
+    renderNewContainerBtn();
+
+})
