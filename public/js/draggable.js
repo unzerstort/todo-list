@@ -55,10 +55,6 @@ export function onDrop(ev) {
     const card = document.getElementById(cardId);
     const newContainerId = ev.target.id;
 
-    if (ev.target.className === "container") {
-        ev.target.appendChild(document.getElementById(cardId));
-    }
-
     if (card && newContainerId.startsWith("container-")) {
         ev.target.appendChild(card);
         const taskId = card.getAttribute("data-task-id");

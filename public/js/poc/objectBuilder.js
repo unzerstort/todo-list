@@ -1,5 +1,5 @@
 import { onDrop, onDragOver, onDragStart } from "../draggable.js";
-import { deleteTaskFromDatabase, addTaskToDatabase, updateTaskOnDatabase, addContainerToDatabase, updateContainerOnDatabase } from "./requests.js";
+import { deleteTaskFromDatabase, addTaskToDatabase, updateTaskOnDatabase, addContainerToDatabase, updateContainerOnDatabase, deleteContainerFromDatabase } from "./requests.js";
 import { createInputElement } from "../utils.js";
 
 export function createContainerElement(containerId, containerName) {
@@ -9,18 +9,51 @@ export function createContainerElement(containerId, containerName) {
     container.addEventListener("drop", onDrop);
     container.setAttribute("id", `container-${containerId}`);
 
+    const containerHeader = createContainerHeader(containerName, containerId);
+    container.appendChild(containerHeader);
+
+    const containerContent = document.createElement("div");
+    containerContent.classList.add("container-content");
+    containerContent.setAttribute("id", `${containerId}`);
+    container.appendChild(containerContent);
+    
+
+    const addCardBtn = createAddCardBtn(containerId);
+    const footer = document.createElement("footer");
+    footer.classList.add("container-footer");
+    footer.appendChild(addCardBtn);
+    
+    container.appendChild(footer);
+
+    return container;
+}
+
+export function createContainerHeader(containerName, containerId) {
+    const containerHeader = document.createElement("div");
+    containerHeader.classList.add("container-header");
+
     const name = document.createElement("h3");
     name.classList.add("container-name");
     name.innerHTML = `${containerName}`;
+    
+    const deleteContainerBtn = createButtonElement("&times;", "delete-container-btn", () => {
+        if (containerId) {
+            if (confirm("Are you sure you want to delete this list?")) {
+                const container = document.getElementById(`container-${containerId}`);
+                container.remove();
+                deleteContainerFromDatabase(containerId);
+            }
+        } else {
+            console.error(`Container with ID ${containerId} not found`);
+        }
+    });
 
     name.addEventListener("click", () => handleTitleClick(name, containerName, containerId));
 
-    const addCardBtn = createAddCardBtn(containerId);
-    
-    container.appendChild(name);
-    container.appendChild(addCardBtn);
+    containerHeader.appendChild(name);
+    containerHeader.appendChild(deleteContainerBtn);
 
-    return container;
+    return containerHeader;
 }
 
 export function handleTitleClick(title, containerName, containerId) {
@@ -85,7 +118,7 @@ export function createCardInputForm(containerId, addButton) {
         }
     });
 
-    const cancelButton = createButtonElement("&times;", "cancel-button", () => {
+    const cancelButton = createButtonElement("Cancel", "cancel-button", () => {
         form.remove();
         addButton.style.display = "block";
     });
@@ -103,15 +136,18 @@ export function createCardInputForm(containerId, addButton) {
 export function createEditCardForm(card) {
     const { form, buttonContainer } = createFormContainer();
     form.setAttribute("id", "edit-card-form");
-
+    
+    const formDiv = document.createElement("div");
+    formDiv.setAttribute("class", "card");
+    
     const titleInput = createInputElement("card-title-input", '', card.querySelector(".card-title").textContent);
-
+    
     const saveButton = createButtonElement("Save", "submit-button", (e) => {
         e.preventDefault();
         const title = titleInput.value.trim();
         if (title) {
             updateTaskOnDatabase(card.getAttribute("data-task-id"), title);
-            form.remove();
+            formDiv.remove();
             card.style.display = "block";
             card.querySelector(".card-title").textContent = title;
         } else {
@@ -119,24 +155,28 @@ export function createEditCardForm(card) {
         }
     });
 
-    const cancelButton = createButtonElement("&times;", "cancel-button", (e) => {
+    const cancelButton = createButtonElement("Cancel", "cancel-button", (e) => {
         e.preventDefault();
-        form.remove();
+        formDiv.remove();
         card.style.display = "block";
     });
-
+    
     buttonContainer.appendChild(saveButton);
     buttonContainer.appendChild(cancelButton);
-
+    
     form.appendChild(titleInput);
-
+    
     form.insertBefore(buttonContainer, titleInput.nextSibling);
 
-    return form;
+    formDiv.appendChild(form);
+    formDiv.appendChild(buttonContainer);
+
+    return formDiv;
 }
 
 export function createEditButton(card) {
-    const editButton = createButtonElement("Edit", "edit-btn", () => {
+    const content = `<span class="material-symbols-outlined">edit</span>`;
+    const editButton = createButtonElement(`${content}`, "edit-btn", () => {
         card.style.display = "none";
         const editForm = createEditCardForm(card);
         card.parentElement.insertBefore(editForm, card.nextSibling);
@@ -146,7 +186,8 @@ export function createEditButton(card) {
 }
 
 export function createDeleteButton(card, taskId) {
-    const deleteButton = createButtonElement("Delete", "delete-btn",  (e) => {
+    const content = `<span class="material-symbols-outlined">delete</span>`;
+    const deleteButton = createButtonElement(`${content}`, "delete-btn",  (e) => {
         if (confirm("Are you sure you want to delete this card?")) {
             // Remove card from DOM
             card.remove();
@@ -168,7 +209,7 @@ export function createButtonElement(text, className, clickHandler) {
 }
 
 export function createAddCardBtn(containerId) {
-    const addCardBtn = createButtonElement("&plus; Add a card", "add-button", () => {
+    const addCardBtn = createButtonElement("&plus; Add a card", "add-card-button", () => {
         addCardBtn.style.display = "none";
         const inputForm = createCardInputForm(containerId, addCardBtn);
         addCardBtn.parentElement.appendChild(inputForm);
@@ -178,7 +219,7 @@ export function createAddCardBtn(containerId) {
 }
 
 export function createAddContainerBtn() {
-    const addContainerBtn = createButtonElement("&plus; Add another list", "add-container-button", () => {
+    const addContainerBtn = createButtonElement("&plus; Add another list", "add-container-btn", () => {
         addContainerBtn.style.display = "none";
         const inputForm = createContainerInputForm(addContainerBtn);
         addContainerBtn.parentElement.appendChild(inputForm);
@@ -204,7 +245,7 @@ export function createContainerInputForm(addButton) {
         }
     });
 
-    const cancelButton = createButtonElement("&times;", "cancel-button", () => {
+    const cancelButton = createButtonElement("Cancel", "cancel-button", () => {
         form.remove();
         addButton.style.display = "block";
     });

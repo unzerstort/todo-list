@@ -19,7 +19,8 @@ export function addCard(taskId, taskTitle, containerId) {
     const container = document.getElementById(`container-${containerId}`);
     
     if (container) {
-        container.appendChild(card);
+        const containerContent = document.getElementById(`${containerId}`);
+        containerContent.appendChild(card);
     } else {
         console.error(`Container with ID ${container} not found`);
         return;

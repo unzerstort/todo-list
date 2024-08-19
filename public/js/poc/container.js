@@ -1,5 +1,4 @@
 import { createAddContainerBtn, createContainerElement } from "./objectBuilder.js";
-import { createInputElement } from "../utils.js";
 
 export function renderContainers(containers) {
     let containerList = [];
@@ -18,7 +17,7 @@ export function addContainer(containerId, containerName) {
         return;
     }
 
-    const containerDiv = document.querySelector(".container-div");
+    const containerDiv = document.querySelector(".container-wrapper");
     const container = createContainerElement(containerId, containerName);
 
     containerDiv.appendChild(container);
