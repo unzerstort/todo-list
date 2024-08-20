@@ -1,5 +1,6 @@
 body {
     background-color: #f0ead2;
+    margin: 0;
 }
 
 .container {
@@ -10,10 +11,9 @@ body {
     border-radius: 10px;
     height: fit-content;
     width: 350px;
-    margin-top: 10px;
     padding: 10px;
+    margin: 20px;
     position: relative;
-    padding-bottom: 40px;
 }
 
 .container-header {
@@ -27,7 +27,6 @@ body {
     display: flex;
     justify-content: center;
     flex-direction: column;
-    margin-bottom: 20px;
 }
 
 .container-footer {
@@ -60,7 +59,9 @@ body {
 
 .container-wrapper {
     display: flex;
-    justify-content: space-around;
+    justify-content: space-between;
+    overflow: hidden;
+    position: absolute;
 }
 
 .card {
@@ -87,7 +88,7 @@ body {
     background-color: #c5d397;
     color: #442613;
     font-family: "Poppins", sans-serif;
-    border: solid 2px green;
+    border: solid 2px #829550;
     border-radius: 8px;
     padding: 10px;
 }
@@ -109,7 +110,7 @@ body {
 }
 
 .button-container {
-    margin-top: 10px;
+    margin-top: 10px; 
 }
 
 button {
@@ -121,7 +122,6 @@ button {
     color: #442613;
     cursor: pointer;
     padding: 5px 10px 5px 10px;
-
 }
 
 button:hover {
@@ -139,7 +139,6 @@ button:hover {
 .delete-btn {
     display: none;
     border-radius: 16px;
-
 }
 
 .submit-button {
@@ -148,8 +147,12 @@ button:hover {
 
 .cancel-button {}
 
+.container-btn-div {
+    margin: 20px;
+}
+
 .add-container-btn {
-    padding: 5px 10px 5px 10px;
+    padding: 5px 20px 5px 20px;
     font-weight: 600;
 }
 
@@ -169,68 +172,74 @@ button:hover {
 
 /* Mobile Devices (up to 480px) */
 @media (max-width: 480px) {
-    body {
-        display: grid;
-        grid-template-columns: 3fr;
-        overflow-y: auto; /* Enable scrolling for body */
-    }
-
     .container {
-        width: 95%;
         padding: 5px;
-        max-width: 100%;
+        max-width: 80vw;
         max-height: 100vh;
     }
 
     .container-wrapper {
         display: flex;
-        flex-direction: column;
-        width: 100%;
-        height: 100vh; /* Full viewport height */
-        overflow-y: auto; /* Enable vertical scrolling */
+        flex-direction: row;
+        justify-content: space-between;
+        height: 100vh;
         padding: 10px;
         box-sizing: border-box;
+        overflow-y: scroll;
     }
 
     .container-header {
-        grid-template-columns: 1fr 1fr; /* Stack columns */
+        grid-template-columns: 89% 1fr 1fr;
+        /* Stack columns */
     }
 
     .card {
         width: auto;
-        margin: 5px; /* Adjust margins */
+        margin: 5px;
+        /* Adjust margins */
+    }
+
+    .card-title-input {
+        width: -moz-available;
+    }
+
+    .container-btn-div {
+        display: flex;
+        justify-content: center;
     }
 }
 
 /* Tablets (481px to 768px) */
 @media (min-width: 481px) and (max-width: 768px) {
-
-
     .container {
         width: 95%;
     }
 
     .container-header {
-        grid-template-columns: 1fr 1fr; /* Two columns */
+        grid-template-columns: 89% 1fr 1fr;
+        /* Two columns */
     }
 
     .card {
-        width: 45%; /* Two cards per row */
+        width: 45%;
+        /* Two cards per row */
     }
 }
 
 /* Desktops (769px and above) */
 @media (min-width: 769px) {
     .container {
-        width: 90%;
+        width: 20vw;
         max-width: 350px;
     }
 
     .container-header {
-        grid-template-columns: 70% 1fr 1fr; /* Original layout */
+        grid-template-columns: 89% 1fr 1fr;
+        /* Original layout */
     }
 
     .card {
-        width: auto; /* Full width for larger screens */
+        width: auto;
+        /* Full width for larger screens */
     }
 }
