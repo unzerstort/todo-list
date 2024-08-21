@@ -31,6 +31,7 @@ export function createContainerElement(containerId, containerName) {
 export function createContainerHeader(containerName, containerId) {
     const containerHeader = document.createElement("div");
     containerHeader.classList.add("container-header");
+    containerHeader.setAttribute("tabindex", "0");
 
     const name = document.createElement("h3");
     name.classList.add("container-name");
@@ -86,17 +87,21 @@ export function createCardElement(taskId, title) {
     card.addEventListener("dragstart", onDragStart);
     card.setAttribute("data-task-id", taskId);
     card.setAttribute("id", `card-${taskId}`);
-
+    card.setAttribute("tabindex", "0");
     const cardTitle = document.createElement("h4");
     cardTitle.classList.add("card-title");
     cardTitle.textContent = title;
-
+    
     const editButton = createEditButton(card);
     const deleteButton = createDeleteButton(card, taskId);
+    const buttonContainer = document.createElement("div");
+    buttonContainer.setAttribute("class", "button-container")
+    
+    buttonContainer.appendChild(editButton);
+    buttonContainer.appendChild(deleteButton);
 
     card.appendChild(cardTitle);
-    card.appendChild(editButton);
-    card.appendChild(deleteButton);
+    card.appendChild(buttonContainer);
 
     return card;
 }
