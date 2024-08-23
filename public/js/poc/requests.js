@@ -12,14 +12,13 @@ export async function fetchTasks() {
 }
 
 export function updateTaskContainer(taskId, newContainerId) {
-    const containerIdNum = parseInt(newContainerId.split("-")[1]);
 
     fetch(`${uri}/tasks/${taskId}/move`, {
         method: "PATCH",
         headers: {
             "Content-Type": "application/json"
         },
-        body: JSON.stringify({ id: taskId, new_container_id: containerIdNum })
+        body: JSON.stringify({ id: taskId, new_container_id: newContainerId })
     })
         .then(response => response.json())
         .then(data => {

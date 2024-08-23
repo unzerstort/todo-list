@@ -16,13 +16,12 @@ export function createContainerElement(containerId, containerName) {
     containerContent.classList.add("container-content");
     containerContent.setAttribute("id", `${containerId}`);
     container.appendChild(containerContent);
-    
 
     const addCardBtn = createAddCardBtn(containerId);
     const footer = document.createElement("footer");
     footer.classList.add("container-footer");
-    footer.appendChild(addCardBtn);
     
+    footer.appendChild(addCardBtn);
     container.appendChild(footer);
 
     return container;

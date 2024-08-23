@@ -30,9 +30,7 @@ export function addCard(taskId, taskTitle, containerId) {
 }
 
 export function moveCardToContainer(taskId, containerId) {
-    const container = document.getElementById(`${containerId}`);
-
-    if (container) {
+    if (containerId) {
         updateTaskContainer(taskId, containerId);
     } else {
         console.error(`Container with ID ${containerId} not found on moveCardToContainer()`);
