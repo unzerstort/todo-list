@@ -1,60 +1,263 @@
+body {
+    background-color: #f0ead2;
+    margin: 0;
+}
+
+li {
+    list-style: none;
+}
 .container {
     display: flex;
-    justify-content: center;
     flex-direction: column;
-    border: solid 2px #000;
-    height: 500px;
-    width: 500px;
-    margin-top: 10px;
-    padding: 10px;
-}
-
-.container-title {
-    cursor: pointer;
-}
-
-.edit-container-title {
-    width: 100%;
-    box-sizing: border-box;
-    padding: 5px;
-    font-size: 1.2em;
-}
-
-.container-div {
-    display: flex;
-    justify-content: space-around;
-}
-
-.card {
-    background-color: pink;
-    border: solid 2px pink;
+    border: solid 2px #dadbb9;
+    background-color: #dadbb9;
     border-radius: 10px;
-    height: 200px;
-    width: 300px;
-    cursor: pointer;
+    height: fit-content;
+    width: 350px;
     padding: 10px;
+    margin: 20px;
+    position: relative;
 }
 
-.card:hover {
-    border: solid 3px plum;
-}
-
-.card:hover .edit-btn {
+.container:hover .delete-container-btn,
+.container:focus-within .delete-container-btn {
     display: block;
 }
 
-.card:hover .delete-btn {
+.container-header {
+    display: grid;
+    grid-template-columns: 1fr 1fr auto;
+    padding: 10px;
+    align-items: center;
+}
+
+.container-content {
+    display: flex;
+    justify-content: center;
+    flex-direction: column;
+    padding: 20px 0 20px 0;
+    height: fit-content;
+}
+
+.container-footer {
+    display: flex;
+    justify-content: center;
+    bottom: 0;
+    padding: 10px;
+}
+
+.container-name {
+    font-family: "Mochiy Pop One", sans-serif;
+    font-size: 1.2rem;
+    color: #6c5445;
+    cursor: pointer;
+}
+
+.edit-container-name {
+    font-family: "Mochiy Pop One", sans-serif;
+    margin-top: 10px;
+    width: 60%;
+    padding: 5px;
+    font-size: 1.2em;
+    background-color: #f0ead2;
+    border: solid 2px #a98467;
+    border-radius: 8px;
+}
+
+.container-wrapper {
+    display: flex;
+    justify-content: space-between;
+    overflow: hidden;
+    position: absolute;
+}
+
+.card {
+    background-color: #c5d397;
+    color: #442613;
+    border: solid 2px #c5d397;
+    border-radius: 10px;
+    height: fit-content;
+    width: 300px;
+    cursor: pointer;
+    padding: 10px;
+    margin: 10px;
+}
+
+.card-title {
+    text-align: justify;
+    word-break: break-all;
+    font-family: "Poppins", sans-serif;
+    font-size: 16px;
+    font-weight: 400;
+}
+
+.card:hover, .card:focus-within {
+    border: solid 2px #adc178;
+}
+
+.card:hover .edit-btn,
+.card:focus-within .edit-btn {
+    display: block;
+    margin-right: 10px;
+}
+
+.card:hover .delete-btn,
+.card:focus-within .delete-btn { 
     display: block;
 }
 
 .card.dragging {
     opacity: 0.5;
+    transform: rotate(15deg);
+}
+
+.button-container {
+    margin-top: 10px;
+}
+
+.card .button-container {
+    display: flex;
+}
+
+button {
+    font-family: "Poppins", sans-serif;
+    font-weight: 500;
+    border-radius: 8px;
+    border: solid 2px #c5d397;
+    background-color: #c5d397;
+    color: #442613;
+    cursor: pointer;
+    padding: 5px 10px 5px 10px;
+}
+
+button:hover {
+    border: solid 2px #adc178;
+    background-color: #adc178;
+}
+
+button:active {
+    box-shadow: 2px 4px 3px #6c584c8a;
+}
+
+input {
+    font-family: "Poppins", sans-serif;
+    font-size: 16px;
+    background-color: #c5d397;
+    border: solid 2px #829550;
+    border-radius: 8px;
+    padding: 10px;
+    color: #442613;
+}
+
+.card-title-input {
+    width: -moz-available;
 }
 
 .edit-btn {
     display: none;
+    border-radius: 16px;
+    padding: 1px 4px 1px 4px;
 }
 
 .delete-btn {
     display: none;
+    border-radius: 16px;
+    padding: 1px 4px 1px 4px;
+}
+
+.submit-button {
+    margin-right: 20px;
+}
+
+.container-btn-div {
+    margin: 20px;
+}
+
+.add-container-btn {
+    padding: 5px 20px 5px 20px;
+    font-weight: 600;
+}
+
+.delete-container-btn {
+    font-family: "Mochiy Pop One", sans-serif;
+    display: none;
+    cursor: pointer;
+    height: fit-content;
+    width: fit-content;
+}
+
+/* Media Queries */
+
+/* Mobile Devices (up to 480px) */
+@media (max-width: 480px) {
+    .container {
+        padding: 5px;
+        max-width: 80vw;
+        max-height: 100vh;
+    }
+
+    .container-wrapper {
+        display: flex;
+        flex-direction: row;
+        justify-content: space-between;
+        height: 100vh;
+        padding: 10px;
+        box-sizing: border-box;
+        overflow-y: scroll;
+    }
+
+    .container-header {
+        grid-template-columns: 89% 1fr 1fr;
+        /* Stack columns */
+    }
+
+    .card {
+        width: auto;
+        margin: 5px;
+        /* Adjust margins */
+    }
+
+    .card-title-input {
+        width: -moz-available;
+    }
+
+    .container-btn-div {
+        display: flex;
+        justify-content: center;
+    }
+}
+
+/* Tablets (481px to 768px) */
+@media (min-width: 481px) and (max-width: 768px) {
+    .container {
+        width: 95%;
+    }
+
+    .container-header {
+        grid-template-columns: 89% 1fr 1fr;
+        /* Two columns */
+    }
+
+    .card {
+        width: 45%;
+        /* Two cards per row */
+    }
+}
+
+/* Desktops (769px and above) */
+@media (min-width: 769px) {
+    .container {
+        width: 20vw;
+        max-width: 350px;
+    }
+
+    .container-header {
+        grid-template-columns: 89% 1fr 1fr;
+        /* Original layout */
+    }
+
+    .card {
+        width: auto;
+        /* Full width for larger screens */
+    }
 }
