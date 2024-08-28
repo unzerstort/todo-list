@@ -2,6 +2,9 @@
 
 Welcome to the Task Manager project! This application provides a simple way to manage your tasks, similar to Trello. With it, you can create, delete, update, and view tasks and lists effortlessly.
 
+![Screenshot of a task management interface showing an 'Add Another List' button at the top. Below, there are three lists labeled 'To Do', 'Doing', and 'Completed'. Each list contains cards, and at the bottom of each list is an 'Add a New Card' button."](/public/task-manager.png)
+
+
 ## Table of Contents
 
 - [Introduction](#introduction)
