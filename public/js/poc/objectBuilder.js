@@ -8,11 +8,12 @@ export function createContainerElement(containerId, containerName) {
     container.addEventListener("dragover", onDragOver);
     container.addEventListener("drop", onDrop);
     container.setAttribute("id", `container-${containerId}`);
+    container.setAttribute("tabindex", "0");
 
     const containerHeader = createContainerHeader(containerName, containerId);
     container.appendChild(containerHeader);
 
-    const containerContent = document.createElement("div");
+    const containerContent = document.createElement("ol");
     containerContent.classList.add("container-content");
     containerContent.setAttribute("id", `${containerId}`);
     container.appendChild(containerContent);
@@ -35,6 +36,7 @@ export function createContainerHeader(containerName, containerId) {
     const name = document.createElement("h3");
     name.classList.add("container-name");
     name.innerHTML = `${containerName}`;
+    name.setAttribute("tabindex", "0");
     
     const deleteContainerBtn = createButtonElement("&times;", "delete-container-btn", () => {
         if (containerId) {
@@ -49,6 +51,7 @@ export function createContainerHeader(containerName, containerId) {
     });
 
     name.addEventListener("click", () => handleTitleClick(name, containerName, containerId));
+    name.addEventListener("focus", () => handleTitleClick(name, containerName, containerId));
 
     containerHeader.appendChild(name);
     containerHeader.appendChild(deleteContainerBtn);
@@ -80,7 +83,7 @@ export function handleTitleClick(title, containerName, containerId) {
 }
 
 export function createCardElement(taskId, title) {
-    const card = document.createElement("div");
+    const card = document.createElement("li");
     card.classList.add("card");
     card.setAttribute("draggable", true);
     card.addEventListener("dragstart", onDragStart);
