@@ -144,7 +144,7 @@ export function createEditCardForm(card) {
     const { form, buttonContainer } = createFormContainer();
     form.setAttribute("id", "edit-card-form");
     
-    const formDiv = document.createElement("div");
+    const formDiv = document.createElement("li");
     formDiv.setAttribute("class", "card");
     
     const titleInput = createInputElement("card-title-input", '', card.querySelector(".card-title").textContent);
@@ -173,10 +173,10 @@ export function createEditCardForm(card) {
     
     form.appendChild(titleInput);
     
+    formDiv.appendChild(buttonContainer);
     form.insertBefore(buttonContainer, titleInput.nextSibling);
 
     formDiv.appendChild(form);
-    formDiv.appendChild(buttonContainer);
 
     return formDiv;
 }
